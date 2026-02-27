@@ -30,11 +30,13 @@ export default function ScrollCarousel({
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [centeredIdx, setCenteredIdx] = useState(0);
+  const centeredIdxRef = useRef(0);
 
   // Mouse drag state
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
+  const hasDragged = useRef(false);
 
   useEffect(() => {
     if (onChange && items[centeredIdx]) {
@@ -57,6 +59,7 @@ export default function ScrollCarousel({
         closestIdx = i;
       }
     });
+    centeredIdxRef.current = closestIdx;
     setCenteredIdx(closestIdx);
   }, []);
 
@@ -93,7 +96,7 @@ export default function ScrollCarousel({
       {/* Carousel track */}
       <div
         ref={containerRef}
-        className="flex overflow-x-auto gap-4 py-10 no-scrollbar select-none"
+        className="flex overflow-x-auto gap-4 py-10 no-scrollbar select-none w-screen relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]"
         style={{
           scrollSnapType: isDragging ? 'none' : 'x mandatory', // Disable snap during drag
           paddingLeft: 'calc(50% - 80px)',
@@ -102,22 +105,29 @@ export default function ScrollCarousel({
         onMouseDown={(e) => {
           if (!containerRef.current) return;
           setIsDragging(true);
+          hasDragged.current = false;
           startX.current = e.pageX - containerRef.current.offsetLeft;
           scrollLeft.current = containerRef.current.scrollLeft;
         }}
         onMouseLeave={() => {
           setIsDragging(false);
-          setCenteredIdx(prev => prev);
         }}
         onMouseUp={() => {
           setIsDragging(false);
-          setCenteredIdx(prev => prev);
+          // Snap strictly to closest element gracefully
+          const el = itemRefs.current[centeredIdxRef.current];
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
         }}
         onMouseMove={(e) => {
           if (!isDragging || !containerRef.current) return;
           e.preventDefault();
           const x = e.pageX - containerRef.current.offsetLeft;
           const walk = (x - startX.current) * 2; // Scroll-fast
+          if (Math.abs(walk) > 10) {
+            hasDragged.current = true;
+          }
           containerRef.current.scrollLeft = scrollLeft.current - walk;
         }}
       >
@@ -132,7 +142,12 @@ export default function ScrollCarousel({
             <div
               key={item.id}
               ref={(el) => { itemRefs.current[i] = el; }}
-              onClick={() => {
+              onClick={(e) => {
+                if (hasDragged.current) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return;
+                }
                 if (isCenter) {
                   onSelect(item.id);
                 } else {
