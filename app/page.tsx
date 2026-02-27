@@ -172,7 +172,7 @@ export default function Home() {
   };
 
   const handleCook = () => {
-    sessionStorage.setItem('bbq_initial_cat', CUTS[activeIdx].category);
+    sessionStorage.setItem('bbq_initial_cat', CATEGORIES[activeIdx].category);
     router.push('/calculator');
   };
 
