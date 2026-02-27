@@ -10,15 +10,15 @@ interface MeatCategory {
 interface CutData {
   id: string;
   name: string;
-  applianceTempC?: { smoker?: number | null };
-  internalTempC?: { smoker?: number | null };
-  timeMode?: { smoker?: string };
-  hoursPerKg?: { smoker?: number | null };
-  flatCookHours?: { smoker?: number | null };
+  applianceTempC?: { smoker?: number | null, oven?: number | null };
+  internalTempC?: { smoker?: number | null, oven?: number | null };
+  timeMode?: { smoker?: string, oven?: string };
+  hoursPerKg?: { smoker?: number | null, oven?: number | null };
+  flatCookHours?: { smoker?: number | null, oven?: number | null };
   restMinutes: number;
-  hasStall?: { smoker?: boolean };
+  hasStall?: { smoker?: boolean, oven?: boolean };
   stallTempC: number | null;
-  wrapTempC?: { smoker?: number | null };
+  wrapTempC?: { smoker?: number | null, oven?: number | null };
   notes?: string;
 }
 
