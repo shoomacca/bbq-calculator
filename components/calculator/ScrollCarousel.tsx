@@ -99,8 +99,6 @@ export default function ScrollCarousel({
         className="flex overflow-x-auto gap-4 py-10 no-scrollbar select-none w-screen relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]"
         style={{
           scrollSnapType: isDragging ? 'none' : 'x mandatory', // Disable snap during drag
-          paddingLeft: 'calc(50% - 80px)',
-          paddingRight: 'calc(50% - 80px)',
         }}
         onMouseDown={(e) => {
           if (!containerRef.current) return;
@@ -131,6 +129,7 @@ export default function ScrollCarousel({
           containerRef.current.scrollLeft = scrollLeft.current - walk;
         }}
       >
+        <div style={{ flexShrink: 0, width: 'calc(50vw - 80px - 1rem)' }} />
         {items.map((item, i) => {
           const offset = i - centeredIdx;
           const isCenter = offset === 0;
@@ -196,6 +195,7 @@ export default function ScrollCarousel({
             </div>
           );
         })}
+        <div style={{ flexShrink: 0, width: 'calc(50vw - 80px - 1rem)' }} />
       </div>
 
       {/* Dot navigation */}
