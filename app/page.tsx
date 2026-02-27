@@ -185,8 +185,8 @@ export default function Home() {
   const radiusY = isMobile ? 60 : 140;
 
   // Swipe handler
-  const handlePanEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipeThreshold = 50;
+  const handleDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipeThreshold = 30;
     if (info.offset.x < -swipeThreshold) {
       // Swiped left, go to next
       handleSelect((activeIdx + 1) % numItems);
@@ -204,7 +204,10 @@ export default function Home() {
         {/* ── Center scene + floating cards ──────────────────────────────────────── */}
         <motion.div 
           className="flex-1 relative flex flex-col items-center justify-center pb-24 min-h-[600px] cursor-grab active:cursor-grabbing"
-          onPanEnd={handlePanEnd}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.05}
+          onDragEnd={handleDragEnd}
         >
 
           {/* 3D Orbiting squircle cards */}
