@@ -28,12 +28,6 @@ export default function Header() {
           className="group flex items-center gap-2"
         >
           <span className="text-[20px] transition-transform group-hover:scale-110 duration-300">🔥</span>
-          <span 
-            className="text-[#FAF6E9] font-bold text-lg tracking-tight"
-            style={{ fontFamily: 'var(--font-display, Georgia, serif)', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
-          >
-            BBQ Calculator
-          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -140,11 +134,11 @@ export default function Header() {
             Techniques
           </Link>
           <Link
-            href="/location"
-            className={`px-4 py-3 rounded-xl font-semibold transition-all ${pathname === '/location' ? 'text-[#FAF6E9] bg-white/10' : 'text-white/80 hover:text-[#FAF6E9] hover:bg-white/5'}`}
+            href="/wood-chart"
+            className={`px-4 py-3 rounded-xl font-semibold transition-all ${pathname === '/wood-chart' ? 'text-[#FAF6E9] bg-white/10' : 'text-white/80 hover:text-[#FAF6E9] hover:bg-white/5'}`}
             onClick={() => setMenuOpen(false)}
           >
-            Location
+            Wood Chart
           </Link>
           
           <div className="h-[1px] w-full bg-white/10 my-1" />
