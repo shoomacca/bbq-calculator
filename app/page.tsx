@@ -129,7 +129,7 @@ export default function Home() {
         <div className="flex-1 w-full max-w-3xl mx-auto flex flex-col justify-center">
           <ScrollCarousel 
             items={scrollItems}
-            title="The BBQ Calculator"
+            title="Smoke Master"
             subtitle="Swipe to select what you're cooking today."
             onChange={(id) => {
               const idx = CATEGORIES.findIndex(c => c.category === id);
