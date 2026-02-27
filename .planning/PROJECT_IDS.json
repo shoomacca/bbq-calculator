@@ -1,0 +1,120 @@
+{
+  "projectName": "dynamic-bbq-slow-cook-calculator",
+  "archetype": "TYPE 02",
+  "createdAt": "2026-02-22T09:22:57.813Z",
+  "github": {
+    "id": null,
+    "nodeId": null,
+    "url": null
+  },
+  "linear": {
+    "projectId": "a348d4f0-bf74-40ab-a015-561929eebacf",
+    "teamId": "bsbsbs",
+    "projectUrl": "https://linear.app/bsbsbs/project/dynamic-bbq-slow-cook-calculator-38013be1c434"
+  },
+  "vercel": {
+    "projectId": null,
+    "url": null
+  },
+  "tasks": {
+    "TASK-001": {
+      "linearId": "d0f4c885-8f38-4fa3-bbb4-e6ae60086218",
+      "linearIdentifier": "ANT-1552",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1552/task-001-nextjs-tailwind-project-setup-and-configuration",
+      "title": ""
+    },
+    "TASK-002": {
+      "linearId": "5ab869dc-a8e5-4c49-92ef-b8e20922d893",
+      "linearIdentifier": "ANT-1555",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1555/task-002-supabase-project-created-auth-and-db-schema-configured",
+      "title": ""
+    },
+    "TASK-003": {
+      "linearId": "fb15dbe9-97da-451a-8e78-f2fd0ac99080",
+      "linearIdentifier": "ANT-1556",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1556/task-003-basic-layout-navigation-shell-mobile-responsive-design-system",
+      "title": ""
+    },
+    "TASK-004": {
+      "linearId": "36fc080f-0c2d-4405-ba2f-82668fb6ff48",
+      "linearIdentifier": "ANT-1554",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1554/task-004-meat-database-all-cuts-methods-formulas",
+      "title": ""
+    },
+    "TASK-005": {
+      "linearId": "4f58f1f2-23b5-459c-bd05-c2b84068dab9",
+      "linearIdentifier": "ANT-1553",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1553/task-005-calculation-logic-cook-time-temps-critical-milestones-rest",
+      "title": ""
+    },
+    "TASK-006": {
+      "linearId": "d0f19b79-882a-450d-a50a-3b1bc0e972ed",
+      "linearIdentifier": "ANT-1558",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1558/task-006-full-calculator-ui-flow-method-cut-weight-results",
+      "title": ""
+    },
+    "TASK-007": {
+      "linearId": "bd603a6c-3d8c-4b93-b87d-40af13067794",
+      "linearIdentifier": "ANT-1561",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1561/task-007-results-page-with-full-cook-profile-output",
+      "title": ""
+    },
+    "TASK-008": {
+      "linearId": "f523c85e-9eba-46a1-947b-47111f278c8a",
+      "linearIdentifier": "ANT-1557",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1557/task-008-critical-milestone-cards-stall-warning-wrap-point-rest-time",
+      "title": ""
+    },
+    "TASK-009": {
+      "linearId": "3ffae0a5-3702-495b-8529-34eefa894d49",
+      "linearIdentifier": "ANT-1559",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1559/task-009-cook-timeline-display",
+      "title": ""
+    },
+    "TASK-010": {
+      "linearId": "19895ab7-cf84-494b-aab0-5ca153ba24d9",
+      "linearIdentifier": "ANT-1560",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1560/task-010-progressive-signup-prompt-save-this-cook",
+      "title": ""
+    },
+    "TASK-011": {
+      "linearId": "096b1d6e-a696-41e4-a2bd-cda39f2741ad",
+      "linearIdentifier": "ANT-1563",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1563/task-011-supabase-auth-integration-email-google",
+      "title": ""
+    },
+    "TASK-012": {
+      "linearId": "ffc03ab1-a525-43bb-a764-a3708d38313f",
+      "linearIdentifier": "ANT-1562",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1562/task-012-saved-cooks-dashboard-view-re-run-delete",
+      "title": ""
+    },
+    "TASK-013": {
+      "linearId": "caa70391-ced0-4eac-93e1-2ab1b8bb78d4",
+      "linearIdentifier": "ANT-1564",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1564/task-013-landing-page-with-value-proposition-copy",
+      "title": ""
+    },
+    "TASK-014": {
+      "linearId": "de024bdf-7fa7-4d6f-acc9-12e5c424508c",
+      "linearIdentifier": "ANT-1566",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1566/task-014-meta-tags-sitemap-structured-data",
+      "title": ""
+    },
+    "TASK-015": {
+      "linearId": "686182ce-5c2f-4ca3-8be6-37ed536c477e",
+      "linearIdentifier": "ANT-1565",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1565/task-015-posthog-analytics-integration",
+      "title": ""
+    },
+    "TASK-016": {
+      "linearId": "a14c40d7-1704-4841-97e7-639e9a13ed25",
+      "linearIdentifier": "ANT-1567",
+      "linearUrl": "https://linear.app/bsbsbs/issue/ANT-1567/task-016-vercel-deployment-custom-domain-setup",
+      "title": ""
+    }
+  },
+  "webhooks": {
+    "research": "https://ai.bsbsbs.au/webhook/research_role"
+  }
+}
