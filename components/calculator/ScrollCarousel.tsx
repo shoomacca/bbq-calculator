@@ -31,6 +31,11 @@ export default function ScrollCarousel({
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [centeredIdx, setCenteredIdx] = useState(0);
 
+  // Mouse drag state
+  const [isDragging, setIsDragging] = useState(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
   useEffect(() => {
     if (onChange && items[centeredIdx]) {
       onChange(items[centeredIdx].id);
@@ -88,11 +93,32 @@ export default function ScrollCarousel({
       {/* Carousel track */}
       <div
         ref={containerRef}
-        className="flex overflow-x-auto gap-4 py-10 no-scrollbar"
+        className="flex overflow-x-auto gap-4 py-10 no-scrollbar select-none"
         style={{
-          scrollSnapType: 'x mandatory',
+          scrollSnapType: isDragging ? 'none' : 'x mandatory', // Disable snap during drag
           paddingLeft: 'calc(50% - 80px)',
           paddingRight: 'calc(50% - 80px)',
+        }}
+        onMouseDown={(e) => {
+          if (!containerRef.current) return;
+          setIsDragging(true);
+          startX.current = e.pageX - containerRef.current.offsetLeft;
+          scrollLeft.current = containerRef.current.scrollLeft;
+        }}
+        onMouseLeave={() => {
+          setIsDragging(false);
+          setCenteredIdx(prev => prev);
+        }}
+        onMouseUp={() => {
+          setIsDragging(false);
+          setCenteredIdx(prev => prev);
+        }}
+        onMouseMove={(e) => {
+          if (!isDragging || !containerRef.current) return;
+          e.preventDefault();
+          const x = e.pageX - containerRef.current.offsetLeft;
+          const walk = (x - startX.current) * 2; // Scroll-fast
+          containerRef.current.scrollLeft = scrollLeft.current - walk;
         }}
       >
         {items.map((item, i) => {
