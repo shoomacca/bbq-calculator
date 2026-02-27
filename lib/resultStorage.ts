@@ -24,7 +24,12 @@ export function clearResult(): void {
   sessionStorage.removeItem(KEY);
 }
 
-export type SavedCook = CalculatorResult & { saveId: string; savedAt: string };
+export type SavedCook = CalculatorResult & { 
+  saveId: string; 
+  savedAt: string;
+  rating?: number; // 1-5 stars
+  notes?: string;
+};
 
 export function saveToHistory(result: CalculatorResult): void {
   if (typeof window === 'undefined') return;
@@ -36,6 +41,16 @@ export function saveToHistory(result: CalculatorResult): void {
   };
   history.unshift(newSave);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+export function updateHistory(saveId: string, updates: Partial<SavedCook>): void {
+  if (typeof window === 'undefined') return;
+  const history = getHistory();
+  const index = history.findIndex(h => h.saveId === saveId);
+  if (index !== -1) {
+    history[index] = { ...history[index], ...updates };
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  }
 }
 
 export function getHistory(): SavedCook[] {
