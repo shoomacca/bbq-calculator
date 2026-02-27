@@ -16,6 +16,7 @@ interface Props {
   subtitle?: string;
   onBack?: () => void;
   ctaPrefix?: string; // e.g. "Cook with" → "Cook with Smoker"
+  onChange?: (id: string) => void;
 }
 
 export default function ScrollCarousel({
@@ -24,10 +25,17 @@ export default function ScrollCarousel({
   title,
   subtitle,
   onBack,
+  onChange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [centeredIdx, setCenteredIdx] = useState(0);
+
+  useEffect(() => {
+    if (onChange && items[centeredIdx]) {
+      onChange(items[centeredIdx].id);
+    }
+  }, [centeredIdx, onChange, items]);
 
   const updateCentered = useCallback(() => {
     const container = containerRef.current;

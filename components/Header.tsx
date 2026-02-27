@@ -28,6 +28,12 @@ export default function Header() {
           className="group flex items-center gap-2"
         >
           <span className="text-[20px] transition-transform group-hover:scale-110 duration-300">🔥</span>
+          <span 
+            className="text-[#FAF6E9] font-bold text-sm md:text-base tracking-widest uppercase mt-0.5"
+            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
+          >
+            Happy Birthday Jason!
+          </span>
         </Link>
 
         {/* Desktop nav */}
