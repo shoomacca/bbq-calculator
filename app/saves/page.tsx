@@ -163,7 +163,7 @@ export default function SavesPage() {
                             <div className="w-px h-4 bg-white/10" />
                             <div className="flex items-center gap-1.5">
                               <span className="text-xl">🔥</span> 
-                              <span className="font-mono">{save.targetTempC}°C internal</span>
+                              <span className="font-mono">{save.internalTempC}°C internal</span>
                             </div>
                              <div className="w-full mt-2">
                                 <button 
