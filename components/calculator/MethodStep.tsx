@@ -5,10 +5,11 @@ import { getMethodsForCategory } from '@/lib/calculator';
 import type { CookingMethod } from '@/types/calculator';
 
 const ALL_METHODS = [
-  { id: 'smoker',     icon: '💨', label: 'Smoker',     sublabel: 'Low & slow · 110°C' },
-  { id: 'oven',       icon: '🔥', label: 'Oven',       sublabel: 'Roasting · 150°C'   },
-  { id: 'rotisserie', icon: '🔄', label: 'Rotisserie', sublabel: 'Spit · 180°C'       },
-  { id: 'dehydrator', icon: '🌬️', label: 'Dehydrator', sublabel: 'Drying · 57°C'      },
+  { id: 'smoker',      icon: '💨', label: 'Smoker',      sublabel: 'Low & slow · 110°C' },
+  { id: 'oven',        icon: '🔥', label: 'Oven',        sublabel: 'Roasting · 150°C'   },
+  { id: 'slow_cooker', icon: '🍲', label: 'Slow Cooker', sublabel: 'Low & slow · 8hrs'  },
+  { id: 'rotisserie',  icon: '🔄', label: 'Rotisserie',  sublabel: 'Spit · 180°C'       },
+  { id: 'dehydrator',  icon: '🌬️', label: 'Dehydrator',  sublabel: 'Drying · 57°C'      },
 ];
 
 interface Props {

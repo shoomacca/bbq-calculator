@@ -6,6 +6,7 @@ import type { CalculatorResult, CookingMethod } from '@/types/calculator';
 const METHOD_LABELS: Record<CookingMethod, string> = {
   smoker:      'Smoker',
   oven:        'Oven',
+  slow_cooker: 'Slow Cooker',
   rotisserie:  'Rotisserie',
   dehydrator:  'Dehydrator',
 };
@@ -13,6 +14,7 @@ const METHOD_LABELS: Record<CookingMethod, string> = {
 const METHOD_ICONS: Record<CookingMethod, string> = {
   smoker:      '💨',
   oven:        '🔥',
+  slow_cooker: '🍲',
   rotisserie:  '🔄',
   dehydrator:  '🌬️',
 };

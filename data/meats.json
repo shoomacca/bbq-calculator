@@ -8,36 +8,43 @@
         "name": "Pork Shoulder (Boston Butt)",
         "methods": [
           "smoker",
-          "oven"
+          "oven",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "per_kg",
-          "oven": "per_kg"
+          "oven": "per_kg",
+          "slow_cooker": "per_kg"
         },
         "hoursPerKg": {
           "smoker": 3.85,
-          "oven": 2.4
+          "oven": 2.4,
+          "slow_cooker": 4
         },
         "flatCookHours": {
           "oven": 1
         },
         "applianceTempC": {
           "smoker": 110,
-          "oven": 150
+          "oven": 150,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 95,
-          "oven": 95
+          "oven": 95,
+          "slow_cooker": 95
         },
         "restMinutes": 60,
         "hasStall": {
           "smoker": true,
-          "oven": false
+          "oven": false,
+          "slow_cooker": false
         },
         "stallTempC": 70,
         "wrapTempC": {
           "smoker": 72,
-          "oven": 67
+          "oven": 67,
+          "slow_cooker": null
         },
         "safeMinTempC": 71,
         "rub": "Classic SPG base: equal parts coarse salt, coarse black pepper, and garlic powder. Add smoked paprika, onion powder, and brown sugar (1 tbsp per kg of meat). Apply generously on all sides and press in. Leave uncovered in the fridge overnight if possible — the dry brine draws moisture back in for a better bark.",
@@ -49,36 +56,43 @@
         "name": "Baby Back Ribs",
         "methods": [
           "smoker",
-          "oven"
+          "oven",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "flat",
-          "oven": "flat"
+          "oven": "flat",
+          "slow_cooker": "flat"
         },
         "hoursPerKg": {
           "oven": 1
         },
         "flatCookHours": {
           "smoker": 5.25,
-          "oven": 3.5
+          "oven": 3.5,
+          "slow_cooker": 8
         },
         "applianceTempC": {
           "smoker": 110,
-          "oven": 150
+          "oven": 150,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 93,
-          "oven": 93
+          "oven": 93,
+          "slow_cooker": 93
         },
         "restMinutes": 25,
         "hasStall": {
           "smoker": false,
-          "oven": false
+          "oven": false,
+          "slow_cooker": false
         },
         "stallTempC": null,
         "wrapTempC": {
           "smoker": 72,
-          "oven": null
+          "oven": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 63,
         "rub": "Combine 2 tbsp brown sugar, 1 tbsp smoked paprika, 1 tsp garlic powder, 1 tsp onion powder, 1 tsp coarse salt, 1 tsp black pepper, and ½ tsp cayenne. Remove the membrane from the bone side first. Rub both sides liberally and rest for 1–4 hrs or overnight in the fridge.",
@@ -90,36 +104,43 @@
         "name": "Pork Belly",
         "methods": [
           "smoker",
-          "oven"
+          "oven",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "per_kg",
-          "oven": "per_kg"
+          "oven": "per_kg",
+          "slow_cooker": "per_kg"
         },
         "hoursPerKg": {
           "smoker": 3.3,
-          "oven": 2.2
+          "oven": 2.2,
+          "slow_cooker": 4
         },
         "flatCookHours": {
           "oven": 1
         },
         "applianceTempC": {
           "smoker": 110,
-          "oven": 150
+          "oven": 150,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 90,
-          "oven": 88
+          "oven": 88,
+          "slow_cooker": 88
         },
         "restMinutes": 30,
         "hasStall": {
           "smoker": false,
-          "oven": false
+          "oven": false,
+          "slow_cooker": false
         },
         "stallTempC": null,
         "wrapTempC": {
           "smoker": null,
-          "oven": null
+          "oven": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 63,
         "rub": "Score the skin in a crosshatch if you want crackling. For the flesh side: coarse salt, black pepper, garlic powder, and five spice (optional). For an Asian-inspired profile: salt, white pepper, five spice, and a light coat of hoisin as a binder. Press into all surfaces and rest uncovered overnight.",
@@ -301,36 +322,43 @@
         "name": "Chuck Roast",
         "methods": [
           "smoker",
-          "oven"
+          "oven",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "per_kg",
-          "oven": "per_kg"
+          "oven": "per_kg",
+          "slow_cooker": "per_kg"
         },
         "hoursPerKg": {
           "smoker": 3.85,
-          "oven": 2.75
+          "oven": 2.75,
+          "slow_cooker": 4
         },
         "flatCookHours": {
           "oven": 1
         },
         "applianceTempC": {
           "smoker": 110,
-          "oven": 150
+          "oven": 150,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 95,
-          "oven": 95
+          "oven": 95,
+          "slow_cooker": 95
         },
         "restMinutes": 60,
         "hasStall": {
           "smoker": true,
-          "oven": false
+          "oven": false,
+          "slow_cooker": false
         },
         "stallTempC": 70,
         "wrapTempC": {
           "smoker": 72,
-          "oven": null
+          "oven": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 63,
         "rub": "Coarse salt, cracked black pepper, garlic powder, onion powder, and smoked paprika. A small amount of brown sugar helps build bark. Tie the roast if it's irregular in shape. Apply and rest uncovered in the fridge for at least 4 hrs, ideally overnight.",
@@ -390,17 +418,20 @@
         "methods": [
           "smoker",
           "oven",
-          "rotisserie"
+          "rotisserie",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "per_kg",
           "oven": "per_kg",
-          "rotisserie": "per_kg"
+          "rotisserie": "per_kg",
+          "slow_cooker": "per_kg"
         },
         "hoursPerKg": {
           "smoker": 2,
           "oven": 1,
-          "rotisserie": 0.75
+          "rotisserie": 0.75,
+          "slow_cooker": 3
         },
         "flatCookHours": {
           "oven": 1
@@ -408,24 +439,28 @@
         "applianceTempC": {
           "smoker": 110,
           "oven": 150,
-          "rotisserie": 180
+          "rotisserie": 180,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 74,
           "oven": 74,
-          "rotisserie": 74
+          "rotisserie": 74,
+          "slow_cooker": 74
         },
         "restMinutes": 12,
         "hasStall": {
           "smoker": false,
           "oven": false,
-          "rotisserie": false
+          "rotisserie": false,
+          "slow_cooker": false
         },
         "stallTempC": null,
         "wrapTempC": {
           "smoker": null,
           "oven": null,
-          "rotisserie": null
+          "rotisserie": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 74,
         "rub": "Under the skin: softened butter blended with minced garlic, fresh thyme, salt, and pepper — push it directly onto the breast and thigh meat. On the skin: salt, smoked paprika, garlic powder, onion powder, and a little oil. For crispier skin, dry-brine with salt only the night before, leave uncovered in the fridge, then apply the full rub before cooking.",
@@ -437,36 +472,43 @@
         "name": "Chicken Thighs (bone-in)",
         "methods": [
           "smoker",
-          "oven"
+          "oven",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "flat",
-          "oven": "flat"
+          "oven": "flat",
+          "slow_cooker": "flat"
         },
         "hoursPerKg": {
           "oven": 1
         },
         "flatCookHours": {
           "smoker": 1.5,
-          "oven": 0.875
+          "oven": 0.875,
+          "slow_cooker": 4
         },
         "applianceTempC": {
           "smoker": 110,
-          "oven": 150
+          "oven": 150,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 82,
-          "oven": 82
+          "oven": 82,
+          "slow_cooker": 82
         },
         "restMinutes": 7,
         "hasStall": {
           "smoker": false,
-          "oven": false
+          "oven": false,
+          "slow_cooker": false
         },
         "stallTempC": null,
         "wrapTempC": {
           "smoker": null,
-          "oven": null
+          "oven": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 74,
         "rub": "Coarse salt, black pepper, smoked paprika, garlic powder, onion powder, and a teaspoon of brown sugar per batch. For crispier skin at the end, apply salt only the night before (draws out moisture), then add the remaining dry rub just before cooking. Pat the skin dry thoroughly before applying any rub.",
@@ -525,36 +567,43 @@
         "name": "Lamb Shoulder (bone-in)",
         "methods": [
           "smoker",
-          "oven"
+          "oven",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "per_kg",
-          "oven": "per_kg"
+          "oven": "per_kg",
+          "slow_cooker": "per_kg"
         },
         "hoursPerKg": {
           "smoker": 3.85,
-          "oven": 2.4
+          "oven": 2.4,
+          "slow_cooker": 4
         },
         "flatCookHours": {
           "oven": 1
         },
         "applianceTempC": {
           "smoker": 110,
-          "oven": 150
+          "oven": 150,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 92,
-          "oven": 92
+          "oven": 92,
+          "slow_cooker": 92
         },
         "restMinutes": 50,
         "hasStall": {
           "smoker": true,
-          "oven": false
+          "oven": false,
+          "slow_cooker": false
         },
         "stallTempC": 70,
         "wrapTempC": {
           "smoker": 72,
-          "oven": null
+          "oven": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 63,
         "rub": "Mediterranean-style: cumin, coriander, smoked paprika, garlic powder, salt, and black pepper — equal parts except salt (double it). Use olive oil as a binder. For a North African profile, swap for ras el hanout. Press into all surfaces and marinate overnight. Score the meat in a few places and push garlic slivers in deep.",
@@ -567,17 +616,20 @@
         "methods": [
           "smoker",
           "oven",
-          "rotisserie"
+          "rotisserie",
+          "slow_cooker"
         ],
         "timeMode": {
           "smoker": "per_kg",
           "oven": "per_kg",
-          "rotisserie": "per_kg"
+          "rotisserie": "per_kg",
+          "slow_cooker": "per_kg"
         },
         "hoursPerKg": {
           "smoker": 2.4,
           "oven": 1.9,
-          "rotisserie": 1.55
+          "rotisserie": 1.55,
+          "slow_cooker": 4
         },
         "flatCookHours": {
           "oven": 1
@@ -585,24 +637,28 @@
         "applianceTempC": {
           "smoker": 110,
           "oven": 150,
-          "rotisserie": 180
+          "rotisserie": 180,
+          "slow_cooker": 95
         },
         "internalTempC": {
           "smoker": 57,
           "oven": 57,
-          "rotisserie": 57
+          "rotisserie": 57,
+          "slow_cooker": 57
         },
         "restMinutes": 25,
         "hasStall": {
           "smoker": false,
           "oven": false,
-          "rotisserie": false
+          "rotisserie": false,
+          "slow_cooker": false
         },
         "stallTempC": null,
         "wrapTempC": {
           "smoker": null,
           "oven": null,
-          "rotisserie": null
+          "rotisserie": null,
+          "slow_cooker": null
         },
         "safeMinTempC": 63,
         "rub": "Classic: minced garlic, fresh rosemary, olive oil, salt, cracked black pepper, and lemon zest. Use a thin-bladed knife to cut deep slits across the leg and push garlic-rosemary paste into each one — this perfumes the meat from the inside. For the smoker, add smoked paprika and a pinch of cumin to the surface rub.",

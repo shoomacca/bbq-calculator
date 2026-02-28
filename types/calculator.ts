@@ -1,4 +1,4 @@
-export type CookingMethod = 'smoker' | 'oven' | 'rotisserie' | 'dehydrator';
+export type CookingMethod = 'smoker' | 'oven' | 'rotisserie' | 'dehydrator' | 'slow_cooker';
 
 export type TimeMode = 'per_kg' | 'flat';
 
