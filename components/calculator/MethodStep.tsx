@@ -21,27 +21,7 @@ interface Props {
 
 export default function MethodStep({ categoryId, onSelect, onBack }: Props) {
   const available = categoryId ? getMethodsForCategory(categoryId) : ALL_METHODS.map((m) => m.id as CookingMethod);
-  
-  const CATEGORY_ICONS: Record<string, string> = {
-    beef: '🐮',
-    pork: '🐷',
-    chicken: '🐔',
-    lamb: '🐑',
-    fish: '🐟',
-    veggies: '🌽',
-    jerky: '🥓',
-    veal: '🐄',
-    turkey: '🦃',
-  };
-
-  const dynamicIcon = categoryId ? (CATEGORY_ICONS[categoryId] || '🥩') : undefined;
-
-  const items = ALL_METHODS
-    .filter((m) => available.includes(m.id as CookingMethod))
-    .map((m) => ({
-      ...m,
-      icon: dynamicIcon || m.icon,
-    }));
+  const items = ALL_METHODS.filter((m) => available.includes(m.id as CookingMethod));
 
   return (
     <ScrollCarousel
