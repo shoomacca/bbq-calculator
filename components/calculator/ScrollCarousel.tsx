@@ -175,22 +175,17 @@ export default function ScrollCarousel({
   return (
     <div className="flex flex-col w-full">
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="px-6 pb-3">
-        {onBack && (
+      {/* ── Back button only — above dots, matches homepage which has no header above carousel */}
+      {onBack && (
+        <div className="px-6 pb-1">
           <button
             onClick={onBack}
-            className="text-brand-muted hover:text-brand-text text-sm mb-3 flex items-center gap-1 transition-colors"
+            className="text-brand-muted hover:text-brand-text text-sm flex items-center gap-1 transition-colors"
           >
             ← Back
           </button>
-        )}
-        <h2 className="text-xl font-bold text-brand-text">{title}</h2>
-        {subtitle && <p className="text-brand-muted text-sm mt-1">{subtitle}</p>}
-        {!isTouch() && (
-          <p className="text-brand-muted/40 text-xs mt-1">Double-click an icon to select</p>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* ── Dot nav ─────────────────────────────────────────────────────── */}
       <div className="flex justify-center gap-2 mb-2">
