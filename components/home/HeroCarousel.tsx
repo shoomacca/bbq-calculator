@@ -183,9 +183,9 @@ export default function HeroCarousel() {
   const halfCard = cardW / 2;
 
   return (
-    <div className="flex flex-col w-full flex-1" style={{ gap: 0 }}>
+    <div className="flex flex-col w-full flex-1 justify-center" style={{ gap: 0 }}>
       {/* Dot navigation */}
-      <div className="flex justify-center gap-2 py-4">
+      <div className="flex justify-center gap-2 py-3">
         {CATEGORIES.map((_, i) => (
           <button
             key={i}
@@ -262,10 +262,8 @@ export default function HeroCarousel() {
         )}
       </div>
 
-      <div className="flex-1" />
-
       {/* CTA */}
-      <div className="px-6 pb-8">
+      <div className="px-6 pt-2 pb-6">
         <button
           onClick={proceed}
           className="w-full bg-brand-secondary hover:bg-brand-primary transition-colors text-white font-black text-lg px-8 py-4 rounded-2xl tracking-wide"

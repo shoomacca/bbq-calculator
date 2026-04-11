@@ -88,7 +88,7 @@ function CalculatorInner() {
   return (
     <div className="flex flex-col flex-1">
       {/* ── Progress bar — constrained, padded ─────────────────────────── */}
-      <div className="max-w-2xl mx-auto w-full px-4 pt-6 pb-6">
+      <div className="max-w-2xl mx-auto w-full px-4 pt-4 pb-3">
         <ProgressBar current={state.step} total={totalSteps} />
       </div>
 

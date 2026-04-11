@@ -104,29 +104,6 @@ export const GEAR: GearItem[] = [
     affiliateUrl: 'https://www.amazon.com.au/s?k=BBQ+Guru+DigiQ+DX3&tag=bsbsbs0f-22',
   },
 
-  // ── Rubs & Seasonings ─────────────────────────────────────────────────────────
-  {
-    slug: 'meat-church-holy-gospel',
-    name: 'Meat Church Holy Gospel Rub',
-    category: 'Rubs & Seasonings',
-    description: 'Garlic-herb all-purpose rub — creates pro-level bark on pork, ribs, and chicken.',
-    affiliateUrl: 'https://www.amazon.com.au/s?k=Meat+Church+Holy+Gospel+Rub&tag=bsbsbs0f-22',
-  },
-  {
-    slug: 'meat-church-holy-cow',
-    name: 'Meat Church Holy Cow Rub',
-    category: 'Rubs & Seasonings',
-    description: 'Peppery beef crust — the go-to for brisket and beef short ribs.',
-    affiliateUrl: 'https://www.amazon.com.au/s?k=Meat+Church+Holy+Cow+Rub&tag=bsbsbs0f-22',
-  },
-  {
-    slug: 'killer-hogs-tx-brisket',
-    name: 'Killer Hogs TX Brisket Rub',
-    category: 'Rubs & Seasonings',
-    description: 'Authentic Texas-style salt & pepper with a hint of spice — competition ready.',
-    affiliateUrl: 'https://www.amazon.com.au/s?k=Killer+Hogs+TX+Brisket+Rub&tag=bsbsbs0f-22',
-  },
-
   // ── Charcoal & Wood ───────────────────────────────────────────────────────────
   {
     slug: 'kingsford-oak-chunks',
@@ -237,7 +214,6 @@ export const GEAR_CATEGORIES = [
   { id: 'Thermometers',        emoji: '🌡️' },
   { id: 'Safety & Protection', emoji: '🧤' },
   { id: 'Tools & Accessories', emoji: '🛠️' },
-  { id: 'Rubs & Seasonings',   emoji: '🧂' },
   { id: 'Charcoal & Wood',     emoji: '🪵' },
   { id: 'Cookware & Storage',  emoji: '🍳' },
   { id: 'Dehydrators',         emoji: '🌬️' },

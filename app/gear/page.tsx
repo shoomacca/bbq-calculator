@@ -8,8 +8,6 @@ function ProductImage({ url, fallback }: { url: string; fallback: string }) {
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    // Only try dp/ (ASIN) pages — search pages return generic Amazon images
-    if (!url.includes('/dp/')) { setSrc(''); return; }
     fetch(`/api/og-image?url=${encodeURIComponent(url)}`)
       .then((r) => r.json())
       .then(({ image }) => setSrc(image ?? ''))
