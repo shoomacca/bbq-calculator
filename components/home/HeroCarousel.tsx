@@ -4,62 +4,125 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const CATEGORIES = [
-  { id: 'pork',    icon: '🐷', label: 'Pork',        headline: 'Low & slow pork glory',      body: 'Shoulder, ribs, belly — all day in the smoke.' },
-  { id: 'beef',    icon: '🐄', label: 'Beef',        headline: 'Brisket? Say less.',          body: 'Melt-in-your-mouth beef, every single time.' },
-  { id: 'chicken', icon: '🐔', label: 'Chicken',     headline: 'From rubbery to legendary',   body: "Never serve dry chicken again. Promise." },
-  { id: 'lamb',    icon: '🐑', label: 'Lamb',        headline: 'The fancy option',            body: "Smoky shoulder, perfect leg — looks hard, isn't." },
-  { id: 'fish',    icon: '🐟', label: 'Fish',        headline: 'Yes, you can smoke fish',     body: "Hot-smoked salmon that'll genuinely blow minds." },
-  { id: 'veggies', icon: '🥦', label: 'Vegetables',  headline: 'Plants deserve smoke too',    body: 'Smoked cauliflower. Smoked garlic paste. Trust us.' },
-  { id: 'jerky',   icon: '🥩', label: 'Jerky & Dried', headline: 'DIY snack game activated', body: 'Make your own jerky. Surprisingly not complicated.' },
+  { id: 'pork',    icon: '🐷', label: 'Pork',         headline: 'Low & slow pork glory',      body: 'Shoulder, ribs, belly — all day in the smoke.' },
+  { id: 'beef',    icon: '🐄', label: 'Beef',         headline: 'Brisket? Say less.',          body: 'Melt-in-your-mouth beef, every single time.' },
+  { id: 'chicken', icon: '🐔', label: 'Chicken',      headline: 'From rubbery to legendary',   body: "Never serve dry chicken again. Promise." },
+  { id: 'lamb',    icon: '🐑', label: 'Lamb',         headline: 'The fancy option',            body: "Smoky shoulder, perfect leg — looks hard, isn't." },
+  { id: 'fish',    icon: '🐟', label: 'Fish',         headline: 'Yes, you can smoke fish',     body: "Hot-smoked salmon that'll genuinely blow minds." },
+  { id: 'veggies', icon: '🥦', label: 'Vegetables',   headline: 'Plants deserve smoke too',    body: 'Smoked cauliflower. Smoked garlic paste. Trust us.' },
+  { id: 'jerky',   icon: '🥩', label: 'Jerky & Dried', headline: 'DIY snack game activated',  body: 'Make your own jerky. Surprisingly not complicated.' },
 ];
+
+const GAP = 20;
+
+/* ── Responsive card size ──────────────────────────────────────────────── */
+function useCardSize() {
+  const [cardW, setCardW] = useState(160);
+  useEffect(() => {
+    const update = () => setCardW(window.innerWidth >= 768 ? 220 : 160);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  return cardW;
+}
+
+/* ── Pointer type (coarse = touch, fine = mouse) ───────────────────────── */
+function isTouch() {
+  return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+}
 
 export default function HeroCarousel() {
   const router = useRouter();
+  const cardW = useCardSize();
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const innerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [centeredIdx, setCenteredIdx] = useState(0);
+  const centeredIdxRef = useRef(0);
 
-  // Mouse drag
+  // Drag state
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
   const scrollStartX = useRef(0);
   const hasDragged = useRef(false);
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const updateCentered = useCallback(() => {
+  // Double-click state
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastClickIdx = useRef<number | null>(null);
+
+  /* ── rAF smooth transform loop ─────────────────────────────────────── */
+  const rafId = useRef<number>(0);
+  const STRIDE = cardW + GAP;
+
+  const tick = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-    const center = container.scrollLeft + container.clientWidth / 2;
+    const scrollLeft = container.scrollLeft;
+    const viewW = container.clientWidth;
+    const center = scrollLeft + viewW / 2;
+
     let closestIdx = 0;
     let closestDist = Infinity;
+
     itemRefs.current.forEach((el, i) => {
       if (!el) return;
-      const dist = Math.abs(el.offsetLeft + el.offsetWidth / 2 - center);
+      const inner = innerRefs.current[i];
+      if (!inner) return;
+
+      const elCenter = el.offsetLeft + el.offsetWidth / 2;
+      const rawOffset = (elCenter - center) / STRIDE;
+      const absOff = Math.abs(rawOffset);
+
+      const scale = absOff < 0.5
+        ? 1.1 - absOff * 0.12
+        : Math.max(0.6, 1.04 - absOff * 0.14);
+      const rotate = Math.max(-22, Math.min(22, rawOffset * 11));
+      const opacity = absOff > 3.5 ? 0 : Math.max(0.2, 1 - absOff * 0.24);
+
+      inner.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+      inner.style.opacity = String(opacity);
+
+      const dist = Math.abs(elCenter - center);
       if (dist < closestDist) { closestDist = dist; closestIdx = i; }
     });
-    setCenteredIdx(closestIdx);
-  }, []);
 
-  const updateCenteredDebounced = useCallback(() => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(updateCentered, 60);
-  }, [updateCentered]);
+    if (closestIdx !== centeredIdxRef.current) {
+      centeredIdxRef.current = closestIdx;
+      setCenteredIdx(closestIdx);
+    }
+  }, [STRIDE]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    container.addEventListener('scroll', updateCenteredDebounced, { passive: true });
-    updateCentered();
-    return () => {
-      container.removeEventListener('scroll', updateCenteredDebounced);
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, [updateCentered, updateCenteredDebounced]);
 
+    const onScroll = () => {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(tick);
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+    // Initial render
+    rafId.current = requestAnimationFrame(tick);
+
+    return () => {
+      container.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, [tick]);
+
+  /* Re-run tick when cardW changes (resize) */
+  useEffect(() => {
+    rafId.current = requestAnimationFrame(tick);
+  }, [cardW, tick]);
+
+  /* ── Scroll helpers ─────────────────────────────────────────────────── */
   const scrollToIdx = (idx: number) => {
     itemRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   };
 
+  /* ── Mouse drag ─────────────────────────────────────────────────────── */
   const onMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
     hasDragged.current = false;
@@ -71,27 +134,49 @@ export default function HeroCarousel() {
   const onMouseMove = (e: React.MouseEvent) => {
     if (!isDragging.current) return;
     const dx = e.clientX - dragStartX.current;
-    if (Math.abs(dx) > 8) hasDragged.current = true;
+    if (Math.abs(dx) > 6) hasDragged.current = true;
     if (containerRef.current) containerRef.current.scrollLeft = scrollStartX.current - dx;
   };
 
   const onMouseUp = () => { isDragging.current = false; };
 
+  /* ── Click / double-click ───────────────────────────────────────────── */
+  const proceed = useCallback(() => {
+    sessionStorage.setItem('bbq_initial_cat', CATEGORIES[centeredIdxRef.current].id);
+    router.push('/calculator');
+  }, [router]);
+
   const handleCardClick = (i: number) => {
     if (hasDragged.current) { hasDragged.current = false; return; }
-    if (i === centeredIdx) {
-      handleCook();
+
+    if (isTouch()) {
+      // Touch: single tap = centre it; if already centred, proceed
+      if (i === centeredIdxRef.current) {
+        proceed();
+      } else {
+        scrollToIdx(i);
+      }
     } else {
-      scrollToIdx(i);
+      // Desktop: single click = centre; double click = proceed
+      if (clickTimer.current !== null && lastClickIdx.current === i) {
+        clearTimeout(clickTimer.current);
+        clickTimer.current = null;
+        lastClickIdx.current = null;
+        proceed();
+      } else {
+        scrollToIdx(i);
+        lastClickIdx.current = i;
+        clickTimer.current = setTimeout(() => {
+          clickTimer.current = null;
+          lastClickIdx.current = null;
+        }, 350);
+      }
     }
   };
 
-  const handleCook = () => {
-    sessionStorage.setItem('bbq_initial_cat', CATEGORIES[centeredIdx].id);
-    router.push('/calculator');
-  };
-
   const centered = CATEGORIES[centeredIdx];
+  const emojiSize = cardW >= 220 ? '7rem' : '4.5rem';
+  const halfCard = cardW / 2;
 
   return (
     <div className="flex flex-col w-full flex-1" style={{ gap: 0 }}>
@@ -111,79 +196,74 @@ export default function HeroCarousel() {
       {/* Carousel */}
       <div
         ref={containerRef}
-        className="flex overflow-x-auto no-scrollbar py-8 cursor-grab active:cursor-grabbing select-none"
+        className="flex overflow-x-auto no-scrollbar cursor-grab active:cursor-grabbing select-none"
         style={{
           scrollSnapType: 'x mandatory',
-          paddingLeft: 'calc(50% - 90px)',
-          paddingRight: 'calc(50% - 90px)',
-          gap: '20px',
+          paddingLeft: `calc(50% - ${halfCard}px)`,
+          paddingRight: `calc(50% - ${halfCard}px)`,
+          gap: `${GAP}px`,
+          paddingTop: '2rem',
+          paddingBottom: '2.5rem',
         }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
       >
-        {CATEGORIES.map((cat, i) => {
-          const offset = i - centeredIdx;
-          const isCenter = offset === 0;
-          const rotation = Math.sign(offset) * Math.min(22, Math.abs(offset) * 11);
-          const scale = isCenter ? 1.25 : Math.max(0.6, 1 - Math.abs(offset) * 0.15);
-          const opacity = Math.abs(offset) > 3 ? 0 : Math.max(0.2, 1 - Math.abs(offset) * 0.25);
-
-          return (
+        {CATEGORIES.map((cat, i) => (
+          <div
+            key={cat.id}
+            ref={(el) => { itemRefs.current[i] = el; }}
+            onClick={() => handleCardClick(i)}
+            style={{ scrollSnapAlign: 'center', flexShrink: 0, width: `${cardW}px` }}
+            className="cursor-pointer"
+          >
+            {/* Inner — transforms managed directly by rAF loop via innerRefs */}
             <div
-              key={cat.id}
-              ref={(el) => { itemRefs.current[i] = el; }}
-              onClick={() => handleCardClick(i)}
-              style={{ scrollSnapAlign: 'center', flexShrink: 0, width: '180px' }}
-              className="cursor-pointer"
+              ref={(el) => { innerRefs.current[i] = el; }}
+              style={{
+                transformOrigin: 'center bottom',
+                willChange: 'transform, opacity',
+              }}
             >
               <div
-                className="flex flex-col items-center"
+                className="rounded-3xl flex flex-col items-center justify-center gap-2 select-none"
                 style={{
-                  transform: `scale(${scale}) rotate(${rotation}deg)`,
-                  opacity,
-                  transformOrigin: 'center bottom',
-                  transition: 'transform 0.25s ease, opacity 0.25s ease',
+                  width: cardW,
+                  height: cardW,
+                  background: '#F2EDD7',
+                  border: i === centeredIdx ? '3px solid #2A5236' : '2px solid #3A6B4A',
+                  boxShadow: i === centeredIdx
+                    ? '0 24px 64px rgba(230,126,34,0.35), 0 8px 24px rgba(0,0,0,0.5)'
+                    : '0 4px 16px rgba(0,0,0,0.35)',
+                  transition: 'border 0.2s ease, box-shadow 0.2s ease',
                 }}
               >
-                <div
-                  className="w-40 h-44 rounded-3xl flex flex-col items-center justify-center gap-2 transition-all duration-300 select-none"
-                  style={{
-                    background: '#F2EDD7',
-                    border: isCenter ? '3px solid #2A5236' : '2px solid #3A6B4A',
-                    boxShadow: isCenter
-                      ? '0 24px 64px rgba(230,126,34,0.35), 0 8px 24px rgba(0,0,0,0.5)'
-                      : '0 4px 16px rgba(0,0,0,0.35)',
-                  }}
-                >
-                  <span className="text-7xl leading-none">{cat.icon}</span>
-                  <span className="font-bold text-sm" style={{ color: '#162818' }}>{cat.label}</span>
-                </div>
+                <span style={{ fontSize: emojiSize, lineHeight: 1 }}>{cat.icon}</span>
+                <span className="font-bold text-sm" style={{ color: '#162818' }}>{cat.label}</span>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* Dynamic headline */}
       <div className="flex flex-col items-center text-center px-6 pt-2 pb-6 gap-2 min-h-[80px]">
-        <h2
-          key={centered.id}
-          className="text-2xl sm:text-3xl font-black text-brand-text italic leading-tight transition-all"
-        >
+        <h2 className="text-2xl sm:text-3xl font-black text-brand-text italic leading-tight">
           {centered.headline}
         </h2>
         <p className="text-brand-muted text-sm">{centered.body}</p>
+        {!isTouch() && (
+          <p className="text-brand-muted/50 text-xs mt-1">Double-click to start cooking</p>
+        )}
       </div>
 
-      {/* Push CTA to bottom */}
       <div className="flex-1" />
 
       {/* CTA */}
       <div className="px-6 pb-8">
         <button
-          onClick={handleCook}
+          onClick={proceed}
           className="w-full bg-brand-secondary hover:bg-brand-primary transition-colors text-white font-black text-lg px-8 py-4 rounded-2xl tracking-wide"
         >
           Cook {centered.label} →
