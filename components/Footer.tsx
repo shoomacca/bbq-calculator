@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 export default function Footer() {
   const pathname = usePathname();
 
-  // Home page is full-viewport — no footer
-  if (pathname === "/") return null;
+  // Calculator flow pages are full-viewport — no footer on any of them
+  if (pathname === '/' || pathname.startsWith('/calculator') || pathname.startsWith('/results')) return null;
 
   const year = new Date().getFullYear();
 

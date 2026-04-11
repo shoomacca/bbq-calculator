@@ -176,8 +176,8 @@ export default function ScrollCarousel({
     /* No flex-1 here — parent (calculator page) handles vertical centering */
     <div className="flex flex-col">
 
-      {/* ── Header ── constrained width ─────────────────────────────────── */}
-      <div className="max-w-2xl mx-auto w-full px-4 pb-3">
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="px-6 pb-3">
         {onBack && (
           <button
             onClick={onBack}
@@ -263,9 +263,9 @@ export default function ScrollCarousel({
         ))}
       </div>
 
-      {/* ── CTA — constrained width, sits immediately below carousel ─────── */}
+      {/* ── CTA — full width, same as homepage button ───────────────────── */}
       {centeredItem && (
-        <div className="max-w-2xl mx-auto w-full px-4 pt-2 pb-2">
+        <div className="px-6 pt-2 pb-6">
           <button
             onClick={() => onSelect(centeredItem.id)}
             className="w-full bg-brand-secondary hover:bg-brand-primary transition-colors text-white font-black text-lg px-8 py-4 rounded-2xl tracking-wide"
