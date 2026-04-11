@@ -92,10 +92,10 @@ function CalculatorInner() {
         <ProgressBar current={state.step} total={totalSteps} />
       </div>
 
-      {/* ── Step content ────────────────────────────────────────────────── */}
+      {/* ── Step content — vertically centred in remaining page space ──── */}
       {/* Carousel steps: full width so calc(50% - halfCard) = 50% of viewport */}
       {/* Weight step: constrained and centred */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col justify-center">
 
         {/* Step 1 (free mode): category carousel — full width */}
         {!pre && state.step === 1 && (

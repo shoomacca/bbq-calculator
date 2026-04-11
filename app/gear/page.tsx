@@ -1,56 +1,107 @@
-import type { Metadata } from 'next';
+'use client';
+
+import { useEffect, useState, useMemo } from 'react';
 import { GEAR, GEAR_CATEGORIES, type GearItem } from '@/data/gear';
 
-export const metadata: Metadata = {
-  title: 'BBQ Gear | BBQ Cook Calculator',
-  description: 'Thermometers, tools, wood, and rubs we actually recommend for better BBQ. Every link supports the site.',
+/* ── Lazy-loaded product image ─────────────────────────────────────────────── */
+function ProductImage({ url, fallback }: { url: string; fallback: string }) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Only try dp/ (ASIN) pages — search pages return generic Amazon images
+    if (!url.includes('/dp/')) { setSrc(''); return; }
+    fetch(`/api/og-image?url=${encodeURIComponent(url)}`)
+      .then((r) => r.json())
+      .then(({ image }) => setSrc(image ?? ''))
+      .catch(() => setSrc(''));
+  }, [url]);
+
+  if (src === null) {
+    // loading
+    return (
+      <div className="w-20 h-20 rounded-xl bg-brand-dark flex items-center justify-center flex-shrink-0 animate-pulse" />
+    );
+  }
+
+  if (src) {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={src}
+        alt=""
+        className="w-20 h-20 rounded-xl object-contain bg-white flex-shrink-0"
+      />
+    );
+  }
+
+  return (
+    <div className="w-20 h-20 rounded-xl bg-brand-dark flex items-center justify-center flex-shrink-0">
+      <span className="text-4xl">{fallback}</span>
+    </div>
+  );
+}
+
+/* ── Category emoji map ─────────────────────────────────────────────────────── */
+const CAT_EMOJI: Record<string, string> = {
+  'Thermometers':        '🌡️',
+  'Tools & Accessories': '🛠️',
+  'Safety & Protection': '🧤',
+  'Charcoal & Wood':     '🪵',
+  'Rubs & Seasonings':   '🧂',
+  'Cookware':            '🍳',
 };
 
-function GearCard({ item }: { item: GearItem }) {
+function GearRow({ item }: { item: GearItem }) {
   return (
     <a
       href={item.affiliateUrl}
       target="_blank"
       rel="noopener noreferrer nofollow"
-      className="group bg-brand-surface border border-white/8 rounded-xl p-4 flex flex-col gap-2 hover:border-white/20 transition-colors"
+      className="group flex items-center gap-4 bg-brand-surface border border-white/8 rounded-xl px-4 py-4 hover:border-white/20 hover:bg-brand-surface/80 transition-all"
     >
-      <div className="flex items-start justify-between gap-2">
+      <ProductImage url={item.affiliateUrl} fallback={CAT_EMOJI[item.category] ?? '🛒'} />
+
+      <div className="flex-1 min-w-0">
         <p className="text-brand-text font-semibold text-sm leading-snug group-hover:text-brand-secondary transition-colors">
           {item.name}
         </p>
-        <span className="text-brand-muted font-bold text-xs whitespace-nowrap mt-0.5">
-          ~${item.priceAUD}
-        </span>
+        <p className="text-brand-muted text-xs mt-1 leading-relaxed line-clamp-2">
+          {item.description}
+        </p>
       </div>
-      <p className="text-brand-muted text-xs leading-relaxed line-clamp-2">{item.description}</p>
-      <div className="mt-auto pt-2">
+
+      <div className="flex-shrink-0">
         <span
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white"
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white whitespace-nowrap"
           style={{ background: '#f97316' }}
         >
-          Shop on Amazon →
+          Shop →
         </span>
       </div>
     </a>
   );
 }
 
-export default function GearPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ cat?: string }>;
-}) {
-  // searchParams is async in Next 15+ — read synchronously via a default
-  const activeCategory = 'All'; // category filter handled client-side via JS below
+export default function GearPage() {
+  const [activeCategory, setActiveCategory] = useState('All');
 
-  const grouped = GEAR_CATEGORIES.slice(1).reduce<Record<string, GearItem[]>>((acc, cat) => {
-    acc[cat.id] = GEAR.filter((g) => g.category === cat.id);
-    return acc;
-  }, {});
+  const filtered = useMemo(
+    () => activeCategory === 'All' ? GEAR : GEAR.filter((g) => g.category === activeCategory),
+    [activeCategory]
+  );
+
+  const grouped = useMemo(() => {
+    if (activeCategory !== 'All') return null;
+    const map: Record<string, GearItem[]> = {};
+    for (const item of filtered) {
+      if (!map[item.category]) map[item.category] = [];
+      map[item.category].push(item);
+    }
+    return map;
+  }, [filtered, activeCategory]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
+    <div className="max-w-2xl mx-auto px-4 py-6">
       <div className="mb-6">
         <h1 className="text-brand-text text-2xl font-bold">BBQ Gear</h1>
         <p className="text-brand-muted text-sm mt-1">
@@ -58,27 +109,45 @@ export default function GearPage({
         </p>
       </div>
 
-      {/* All categories — grouped with section headers */}
-      <div className="flex flex-col gap-10">
-        {GEAR_CATEGORIES.slice(1).map(({ id, emoji }) => {
-          const items = grouped[id];
-          if (!items?.length) return null;
-          return (
-            <section key={id}>
-              <h2 className="text-brand-text font-bold text-base mb-4">
-                {emoji} {id}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {items.map((item) => (
-                  <GearCard key={item.slug} item={item} />
-                ))}
-              </div>
-            </section>
-          );
-        })}
+      {/* Category tabs */}
+      <div className="flex gap-2 flex-wrap mb-6">
+        {GEAR_CATEGORIES.map(({ id, emoji }) => (
+          <button
+            key={id}
+            onClick={() => setActiveCategory(id)}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+            style={{
+              background: activeCategory === id ? '#f97316' : 'rgba(255,255,255,0.07)',
+              color: activeCategory === id ? 'white' : undefined,
+              border: activeCategory === id ? 'none' : '1px solid rgba(255,255,255,0.12)',
+            }}
+          >
+            {emoji ? `${emoji} ` : ''}{id}
+          </button>
+        ))}
       </div>
 
-      {/* Disclosure */}
+      {/* All — grouped with section headers */}
+      {grouped && (
+        <div className="flex flex-col gap-10">
+          {GEAR_CATEGORIES.slice(1).filter(({ id }) => grouped[id]?.length).map(({ id, emoji }) => (
+            <section key={id}>
+              <h2 className="text-brand-text font-bold text-base mb-3">{emoji} {id}</h2>
+              <div className="flex flex-col gap-3">
+                {grouped[id].map((item) => <GearRow key={item.slug} item={item} />)}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
+
+      {/* Single category — flat list */}
+      {!grouped && (
+        <div className="flex flex-col gap-3">
+          {filtered.map((item) => <GearRow key={item.slug} item={item} />)}
+        </div>
+      )}
+
       <p className="text-brand-muted/40 text-xs text-center mt-12">
         BBQ Calculator earns a commission from qualifying Amazon purchases via links on this page.
       </p>

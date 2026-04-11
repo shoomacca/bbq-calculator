@@ -17,9 +17,13 @@ const GAP = 20;
 
 /* ── Responsive card size ──────────────────────────────────────────────── */
 function useCardSize() {
-  const [cardW, setCardW] = useState(160);
+  const [cardW, setCardW] = useState(180);
   useLayoutEffect(() => {
-    const update = () => setCardW(window.innerWidth >= 768 ? 220 : 160);
+    const update = () => {
+      if (window.innerWidth >= 1024) setCardW(268);
+      else if (window.innerWidth >= 768) setCardW(220);
+      else setCardW(180);
+    };
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
@@ -175,7 +179,7 @@ export default function HeroCarousel() {
   };
 
   const centered = CATEGORIES[centeredIdx];
-  const emojiSize = cardW >= 220 ? '7rem' : '4.5rem';
+  const emojiSize = cardW >= 268 ? '8.5rem' : cardW >= 220 ? '7rem' : '5.5rem';
   const halfCard = cardW / 2;
 
   return (
