@@ -173,8 +173,7 @@ export default function ScrollCarousel({
   const halfCard     = cardW / 2;
 
   return (
-    /* No flex-1 here — parent (calculator page) handles vertical centering */
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="px-6 pb-3">
@@ -233,12 +232,13 @@ export default function ScrollCarousel({
             style={{ scrollSnapAlign: 'center', flexShrink: 0, width: `${cardW}px` }}
             className="cursor-pointer"
           >
+            {/* Rotating card — emoji only, no text inside */}
             <div
               ref={(el) => { innerRefs.current[i] = el; }}
               style={{ transformOrigin: 'center bottom', willChange: 'transform, opacity' }}
             >
               <div
-                className="rounded-3xl flex flex-col items-center justify-center gap-3 select-none"
+                className="rounded-3xl flex items-center justify-center select-none"
                 style={{
                   width:     cardW,
                   height:    cardW,
@@ -251,21 +251,29 @@ export default function ScrollCarousel({
                 }}
               >
                 <span style={{ fontSize: emojiSize, lineHeight: 1 }}>{item.icon}</span>
-                <span className="font-bold text-base" style={{ color: '#162818' }}>{item.label}</span>
-                {item.sublabel && (
-                  <span className="text-xs text-center px-3 leading-tight" style={{ color: '#4a7a5a' }}>
-                    {item.sublabel}
-                  </span>
-                )}
               </div>
             </div>
           </div>
         ))}
       </div>
 
+      {/* ── Label — static centred text below carousel (like homepage headline) */}
+      <div className="flex flex-col items-center text-center px-6 pt-1 pb-4 min-h-[60px]">
+        {centeredItem && (
+          <>
+            <p className="text-brand-text font-black text-xl italic leading-tight">
+              {centeredItem.label}
+            </p>
+            {centeredItem.sublabel && (
+              <p className="text-brand-muted text-sm mt-1">{centeredItem.sublabel}</p>
+            )}
+          </>
+        )}
+      </div>
+
       {/* ── CTA — full width, same as homepage button ───────────────────── */}
       {centeredItem && (
-        <div className="px-6 pt-2 pb-6">
+        <div className="px-6 pt-0 pb-6">
           <button
             onClick={() => onSelect(centeredItem.id)}
             className="w-full bg-brand-secondary hover:bg-brand-primary transition-colors text-white font-black text-lg px-8 py-4 rounded-2xl tracking-wide"

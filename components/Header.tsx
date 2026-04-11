@@ -28,6 +28,12 @@ export default function Header() {
             Home
           </Link>
           <Link
+            href="/recipes"
+            className="text-brand-muted hover:text-brand-text transition-colors"
+          >
+            Recipes
+          </Link>
+          <Link
             href="/gallery"
             className="text-brand-muted hover:text-brand-text transition-colors"
           >
@@ -107,6 +113,13 @@ export default function Header() {
             onClick={() => setMenuOpen(false)}
           >
             Home
+          </Link>
+          <Link
+            href="/recipes"
+            className="text-brand-muted hover:text-brand-text transition-colors"
+            onClick={() => setMenuOpen(false)}
+          >
+            Recipes
           </Link>
           <Link
             href="/gallery"
