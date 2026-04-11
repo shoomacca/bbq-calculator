@@ -46,6 +46,12 @@ export default function Header() {
             Guides
           </Link>
           <Link
+            href="/rubs"
+            className="text-brand-muted hover:text-brand-text transition-colors"
+          >
+            Rubs
+          </Link>
+          <Link
             href="/wood-chart"
             className="text-brand-muted hover:text-brand-text transition-colors"
           >
@@ -122,6 +128,13 @@ export default function Header() {
             onClick={() => setMenuOpen(false)}
           >
             Guides
+          </Link>
+          <Link
+            href="/rubs"
+            className="text-brand-muted hover:text-brand-text transition-colors"
+            onClick={() => setMenuOpen(false)}
+          >
+            Rubs
           </Link>
           <Link
             href="/wood-chart"

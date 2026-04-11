@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const CATEGORIES = [
@@ -18,7 +18,7 @@ const GAP = 20;
 /* ── Responsive card size ──────────────────────────────────────────────── */
 function useCardSize() {
   const [cardW, setCardW] = useState(160);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const update = () => setCardW(window.innerWidth >= 768 ? 220 : 160);
     update();
     window.addEventListener('resize', update);
@@ -93,19 +93,19 @@ export default function HeroCarousel() {
     }
   }, [STRIDE]);
 
+  /* Run tick synchronously after first DOM paint — eliminates the flash frame */
+  useLayoutEffect(() => {
+    rafId.current = requestAnimationFrame(tick);
+  }, [tick]);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
     const onScroll = () => {
       cancelAnimationFrame(rafId.current);
       rafId.current = requestAnimationFrame(tick);
     };
-
     container.addEventListener('scroll', onScroll, { passive: true });
-    // Initial render
-    rafId.current = requestAnimationFrame(tick);
-
     return () => {
       container.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(rafId.current);
