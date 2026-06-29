@@ -18,11 +18,11 @@ const abrilFatface = Abril_Fatface({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | BBQ Pro',
-    default: 'BBQ Pro — Know Exactly When Your BBQ Is Done',
+    template: '%s | Rough Cut BBQ',
+    default: 'Rough Cut BBQ — Know Exactly When Your BBQ Is Done',
   },
   description:
-    'Enter your meat, weight, and cooking method — get a precise cook plan. Metric units. No login required.',
+    'Rough Cut BBQ Calculator and Forum. Enter your meat, weight, and cooking method — get a precise cook plan. Share images and comments anonymously.',
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { loadResult, loadInput, clearResult } from '@/lib/resultStorage';
+import { loadResult, loadInput, clearResult, addToHistory } from '@/lib/resultStorage';
 import { calculateCook } from '@/lib/calculator';
 import { buildShareUrl, copyToClipboard } from '@/lib/shareUtils';
 import { nowTimeString, addHours } from '@/lib/timeUtils';
@@ -31,6 +31,44 @@ function ResultsInner() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  const handleSaveCook = async () => {
+    if (saveStatus !== 'idle' || !result) return;
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/auth/me');
+      const { user } = await res.json();
+      
+      if (user) {
+        const saveRes = await fetch('/api/saves', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(result),
+        });
+        if (saveRes.ok) {
+          addToHistory(result);
+          setSaveStatus('saved');
+          setTimeout(() => setSaveStatus('idle'), 3000);
+        } else {
+          addToHistory(result);
+          setSaveStatus('saved');
+          setTimeout(() => setSaveStatus('idle'), 3000);
+          setShowSaveModal(true);
+        }
+      } else {
+        addToHistory(result);
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+        setShowSaveModal(true);
+      }
+    } catch {
+      addToHistory(result);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+      setShowSaveModal(true);
+    }
+  };
 
   // Increment tally once per 60-second session window
   useEffect(() => {
@@ -56,8 +94,10 @@ function ResultsInner() {
     const stored = loadResult();
     const storedInput = loadInput();
     if (stored && storedInput) {
-      setResult(stored);
-      setInput(storedInput);
+      Promise.resolve().then(() => {
+        setResult(stored);
+        setInput(storedInput);
+      });
       return;
     }
 
@@ -76,8 +116,10 @@ function ResultsInner() {
           weightKg: parseFloat(kg),
         };
         const urlResult = calculateCook(urlInput);
-        setResult(urlResult);
-        setInput(urlInput);
+        Promise.resolve().then(() => {
+          setResult(urlResult);
+          setInput(urlInput);
+        });
       } catch {
         router.replace('/calculator');
       }
@@ -138,10 +180,11 @@ function ResultsInner() {
         {/* Action buttons */}
         <div className="no-print flex flex-wrap gap-3">
           <button
-            onClick={() => setShowSaveModal(true)}
-            className="flex-1 min-w-[140px] bg-brand-primary hover:bg-brand-secondary transition-colors text-white font-bold px-6 py-3 rounded-xl text-sm"
+            onClick={handleSaveCook}
+            disabled={saveStatus === 'saving'}
+            className="flex-1 min-w-[140px] bg-brand-primary hover:bg-brand-secondary disabled:opacity-50 transition-colors text-white font-bold px-6 py-3 rounded-xl text-sm cursor-pointer"
           >
-            🔖 Save this cook
+            {saveStatus === 'saving' ? '⏳ Saving...' : saveStatus === 'saved' ? '✅ Saved!' : '🔖 Save this cook'}
           </button>
           <button
             onClick={() => window.print()}

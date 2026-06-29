@@ -113,9 +113,9 @@ export async function POST(req: Request) {
     );
 
     await resend.emails.send({
-      from: process.env.EMAIL_FROM ?? 'BBQ Pro <hello@bbqpro.app>',
+      from: process.env.EMAIL_FROM ?? 'Rough Cut BBQ <hello@roughcut.com.au>',
       to: email,
-      subject: `Your BBQ Pro Cook Plan${cut && method ? ` — ${cut} on ${method}` : ''}`,
+      subject: `Your Rough Cut BBQ Cook Plan${cut && method ? ` — ${cut} on ${method}` : ''}`,
       html,
     });
   } catch (err) {

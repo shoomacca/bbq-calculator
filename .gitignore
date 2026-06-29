@@ -40,3 +40,8 @@ Thumbs.db
 .idea/
 
 .vercel
+
+# Custom
+*.apk
+/tmp/
+/scripts/

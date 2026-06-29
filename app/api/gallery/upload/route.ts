@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { nanoid } from 'nanoid';
+import { cookies } from 'next/headers';
 import pool from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'gallery');
 const BASE_URL = 'https://bbq.bsbsbs.au/uploads/gallery';
@@ -50,10 +52,20 @@ export async function POST(req: Request) {
   const beforeUrl = `${BASE_URL}/${postId}-before.${ext(before)}`;
   const afterUrl = `${BASE_URL}/${postId}-after.${ext(after)}`;
 
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session');
+  let userId: number | null = null;
+  if (sessionCookie) {
+    const user = verifyToken(sessionCookie.value);
+    if (user) {
+      userId = user.userId;
+    }
+  }
+
   await pool.execute(
-    `INSERT INTO gallery_posts (id, before_url, after_url, name, cut, method, gear_used)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [postId, beforeUrl, afterUrl, name, cut, method, gearUsed]
+    `INSERT INTO gallery_posts (id, before_url, after_url, name, cut, method, gear_used, user_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [postId, beforeUrl, afterUrl, name, cut, method, gearUsed, userId]
   );
 
   return NextResponse.json({ ok: true, postId });

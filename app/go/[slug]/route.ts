@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
+import { RowDataPacket } from 'mysql2';
 import pool from '@/lib/db';
+
+interface GearRow extends RowDataPacket {
+  affiliate_url: string;
+}
 
 export async function GET(
   _req: Request,
@@ -7,12 +12,12 @@ export async function GET(
 ) {
   const { slug } = await params;
 
-  const [rows] = await pool.execute<any[]>(
+  const [rows] = await pool.execute<GearRow[]>(
     'SELECT affiliate_url FROM gear WHERE slug = ?',
     [slug]
   );
 
-  const affiliateUrl = (rows as any[])[0]?.affiliate_url as string | undefined;
+  const affiliateUrl = rows[0]?.affiliate_url;
 
   // Log click — fire and forget
   pool.execute('INSERT INTO gear_clicks (gear_slug) VALUES (?)', [slug]).catch(() => {});

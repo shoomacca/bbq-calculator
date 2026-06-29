@@ -10,10 +10,29 @@ export default function SavesPage() {
   const [mounted, setMounted] = useState(false);
   const [saves, setSaves] = useState<SavedCook[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
 
   useEffect(() => {
-    setSaves(getHistory());
-    setMounted(true);
+    Promise.resolve().then(async () => {
+      try {
+        const meRes = await fetch('/api/auth/me');
+        const meData = await meRes.json();
+        
+        if (meData.user) {
+          setUser(meData.user);
+          const savesRes = await fetch('/api/saves');
+          const savesData = await savesRes.json();
+          setSaves(savesData.saves || []);
+        } else {
+          setSaves(getHistory());
+        }
+      } catch (e) {
+        console.error(e);
+        setSaves(getHistory());
+      } finally {
+        setMounted(true);
+      }
+    });
   }, []);
 
   const handleLoad = (save: SavedCook) => {
@@ -21,21 +40,61 @@ export default function SavesPage() {
     router.push('/results');
   };
 
-  const handleDelete = (e: React.MouseEvent, id: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    deleteFromHistory(id);
-    setSaves(getHistory());
+    if (user) {
+      try {
+        const res = await fetch(`/api/saves?saveId=${id}`, {
+          method: 'DELETE',
+        });
+        if (res.ok) {
+          setSaves((prev) => prev.filter((s) => s.saveId !== id));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      deleteFromHistory(id);
+      setSaves(getHistory());
+    }
   };
 
-  const handleRating = (e: React.MouseEvent, id: string, rating: number) => {
+  const handleRating = async (e: React.MouseEvent, id: string, rating: number) => {
     e.stopPropagation();
-    updateHistory(id, { rating });
-    setSaves(getHistory());
+    if (user) {
+      try {
+        const res = await fetch('/api/saves', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ saveId: id, rating }),
+        });
+        if (res.ok) {
+          setSaves((prev) => prev.map((s) => (s.saveId === id ? { ...s, rating } : s)));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      updateHistory(id, { rating });
+      setSaves(getHistory());
+    }
   };
 
-  const handleNotes = (id: string, notes: string) => {
-    updateHistory(id, { notes });
-    setSaves(getHistory());
+  const handleNotes = async (id: string, notes: string) => {
+    setSaves((prev) => prev.map((s) => (s.saveId === id ? { ...s, notes } : s)));
+    if (user) {
+      try {
+        await fetch('/api/saves', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ saveId: id, notes }),
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      updateHistory(id, { notes });
+    }
   };
 
   if (!mounted) return null;

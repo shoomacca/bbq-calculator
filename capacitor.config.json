@@ -1,0 +1,10 @@
+{
+  "appId": "com.roughcutbbq.app",
+  "appName": "Rough Cut BBQ",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://bbq.bsbsbs.au",
+    "cleartext": true
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "cook_tally": [
+    {
+      "id": 1,
+      "count": 1,
+      "updated_at": "2026-06-29T02:58:26.245Z"
+    }
+  ],
+  "gallery_posts": [],
+  "gear": [
+    {
+      "id": 1,
+      "slug": "thermapen-one",
+      "name": "Thermapen ONE",
+      "category": "Thermometers",
+      "affiliate_url": "#",
+      "description": "Instant-read thermometer — reads in 1 second. The gold standard for BBQ.",
+      "recommended_for": "all",
+      "sort_order": 1
+    },
+    {
+      "id": 2,
+      "slug": "meater-plus",
+      "name": "MEATER+",
+      "category": "Thermometers",
+      "affiliate_url": "#",
+      "description": "Wireless smart probe — monitor from your phone up to 50m away.",
+      "recommended_for": "Smoker,Kamado,Oven",
+      "sort_order": 2
+    },
+    {
+      "id": 3,
+      "slug": "thermoworks-smoke",
+      "name": "ThermoWorks Smoke",
+      "category": "Thermometers",
+      "affiliate_url": "#",
+      "description": "Dual-probe remote thermometer — monitor pit and meat simultaneously.",
+      "recommended_for": "Smoker,Kamado,Wood Fire",
+      "sort_order": 3
+    },
+    {
+      "id": 4,
+      "slug": "inkbird-ibt-4xs",
+      "name": "Inkbird IBT-4XS",
+      "category": "Thermometers",
+      "affiliate_url": "#",
+      "description": "Bluetooth 4-probe thermometer — great value for multi-protein cooks.",
+      "recommended_for": "all",
+      "sort_order": 4
+    },
+    {
+      "id": 5,
+      "slug": "weber-smokey-mountain-18",
+      "name": "Weber Smokey Mountain 18\"",
+      "category": "Smokers",
+      "affiliate_url": "#",
+      "description": "The classic water smoker. Reliable, affordable, beloved by competition pitmasters.",
+      "recommended_for": "Smoker",
+      "sort_order": 10
+    },
+    {
+      "id": 6,
+      "slug": "weber-kettle-57",
+      "name": "Weber Kettle 57cm",
+      "category": "Smokers",
+      "affiliate_url": "#",
+      "description": "The iconic charcoal kettle — grilling, smoking, roasting all in one.",
+      "recommended_for": "Charcoal Kettle,BBQ (Charcoal/Gas)",
+      "sort_order": 11
+    },
+    {
+      "id": 7,
+      "slug": "big-green-egg-large",
+      "name": "Big Green Egg (Large)",
+      "category": "Smokers",
+      "affiliate_url": "#",
+      "description": "The original kamado — retains heat like nothing else. Built to last a lifetime.",
+      "recommended_for": "Kamado",
+      "sort_order": 12
+    },
+    {
+      "id": 8,
+      "slug": "pit-barrel-cooker",
+      "name": "Pit Barrel Cooker",
+      "category": "Smokers",
+      "affiliate_url": "#",
+      "description": "Drum smoker — incredibly simple, produces outstanding smoke flavour.",
+      "recommended_for": "Smoker",
+      "sort_order": 13
+    },
+    {
+      "id": 9,
+      "slug": "napoleon-pro-500",
+      "name": "Napoleon PRO 500",
+      "category": "Smokers",
+      "affiliate_url": "#",
+      "description": "Premium gas grill with infrared sear zone and smoker tray.",
+      "recommended_for": "BBQ (Charcoal/Gas)",
+      "sort_order": 14
+    },
+    {
+      "id": 10,
+      "slug": "weber-briquettes-8kg",
+      "name": "Weber Briquettes 8kg",
+      "category": "Charcoal & Fuel",
+      "affiliate_url": "#",
+      "description": "Long-burn briquettes — consistent heat, low ash. Perfect for low-and-slow.",
+      "recommended_for": "Charcoal Kettle,Smoker",
+      "sort_order": 20
+    },
+    {
+      "id": 11,
+      "slug": "jealous-devil-lump",
+      "name": "Jealous Devil Lump Charcoal",
+      "category": "Charcoal & Fuel",
+      "affiliate_url": "#",
+      "description": "Premium hardwood lump — burns hotter and cleaner than briquettes.",
+      "recommended_for": "Kamado,BBQ (Charcoal/Gas)",
+      "sort_order": 21
+    },
+    {
+      "id": 12,
+      "slug": "weber-hickory-chunks",
+      "name": "Weber Hickory Wood Chunks",
+      "category": "Charcoal & Fuel",
+      "affiliate_url": "#",
+      "description": "Hickory chunks for bold smoky flavour. Great with beef and pork.",
+      "recommended_for": "Smoker,Kamado,Wood Fire",
+      "sort_order": 22
+    },
+    {
+      "id": 13,
+      "slug": "weber-applewood-chips",
+      "name": "Weber Apple Wood Chips",
+      "category": "Charcoal & Fuel",
+      "affiliate_url": "#",
+      "description": "Mild, sweet smoke — ideal for chicken, fish, and pork.",
+      "recommended_for": "Smoker,Kamado,Charcoal Kettle",
+      "sort_order": 23
+    },
+    {
+      "id": 14,
+      "slug": "fire-starters-pack",
+      "name": "Weber Fire Starters (50pk)",
+      "category": "Charcoal & Fuel",
+      "affiliate_url": "#",
+      "description": "Odourless, reliable fire starters. Never use lighter fluid again.",
+      "recommended_for": "all",
+      "sort_order": 24
+    },
+    {
+      "id": 15,
+      "slug": "killer-hogs-bbq-rub",
+      "name": "Killer Hogs The BBQ Rub",
+      "category": "Rubs & Seasonings",
+      "affiliate_url": "#",
+      "description": "Championship-winning rub — the benchmark for competition-style BBQ flavour.",
+      "recommended_for": "all",
+      "sort_order": 30
+    },
+    {
+      "id": 16,
+      "slug": "meat-church-holy-gospel",
+      "name": "Meat Church Holy Gospel",
+      "category": "Rubs & Seasonings",
+      "affiliate_url": "#",
+      "description": "All-purpose BBQ rub — sweet heat with a Tex-Mex influence.",
+      "recommended_for": "all",
+      "sort_order": 31
+    },
+    {
+      "id": 17,
+      "slug": "lanes-bbq-signature",
+      "name": "Lane's BBQ Signature Blend",
+      "category": "Rubs & Seasonings",
+      "affiliate_url": "#",
+      "description": "Savoury-sweet blend — works on everything from brisket to veggies.",
+      "recommended_for": "all",
+      "sort_order": 32
+    },
+    {
+      "id": 18,
+      "slug": "maldon-sea-salt",
+      "name": "Maldon Sea Salt Flakes",
+      "category": "Rubs & Seasonings",
+      "affiliate_url": "#",
+      "description": "Finishing salt for steaks and grilled proteins — a little goes a long way.",
+      "recommended_for": "all",
+      "sort_order": 33
+    },
+    {
+      "id": 19,
+      "slug": "weber-chimney-starter",
+      "name": "Weber Chimney Starter",
+      "category": "Accessories",
+      "affiliate_url": "#",
+      "description": "Light charcoal in 15 minutes — no lighter fluid, no mess.",
+      "recommended_for": "Charcoal Kettle,Smoker,Kamado",
+      "sort_order": 40
+    },
+    {
+      "id": 20,
+      "slug": "rapicca-bbq-gloves",
+      "name": "RAPICCA BBQ Gloves (932°F)",
+      "category": "Accessories",
+      "affiliate_url": "#",
+      "description": "Heat-resistant gloves rated to 500°C — pull pork bare-handed like a pro.",
+      "recommended_for": "all",
+      "sort_order": 41
+    },
+    {
+      "id": 21,
+      "slug": "spitjack-injector",
+      "name": "SpitJack Magnum Meat Injector",
+      "category": "Accessories",
+      "affiliate_url": "#",
+      "description": "Professional-grade injector — marinades deep into thick cuts like brisket and shoulder.",
+      "recommended_for": "Smoker,Kamado,Oven",
+      "sort_order": 42
+    },
+    {
+      "id": 22,
+      "slug": "oxo-basting-brush",
+      "name": "OXO Silicone Basting Brush",
+      "category": "Accessories",
+      "affiliate_url": "#",
+      "description": "Silicone bristles hold sauce perfectly — dishwasher safe.",
+      "recommended_for": "all",
+      "sort_order": 43
+    },
+    {
+      "id": 23,
+      "slug": "teakhaus-xl-board",
+      "name": "Teakhaus XL Teak Cutting Board",
+      "category": "Accessories",
+      "affiliate_url": "#",
+      "description": "Extra-large teak board — perfect for resting and slicing whole briskets.",
+      "recommended_for": "all",
+      "sort_order": 44
+    },
+    {
+      "id": 24,
+      "slug": "instant-read-timer",
+      "name": "ThermoWorks TimeStack Timer",
+      "category": "Accessories",
+      "affiliate_url": "#",
+      "description": "4-channel kitchen timer — track multiple milestones in your cook simultaneously.",
+      "recommended_for": "all",
+      "sort_order": 45
+    }
+  ],
+  "gear_clicks": [],
+  "subscribers": [],
+  "users": [],
+  "saved_cooks": []
+}

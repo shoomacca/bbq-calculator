@@ -29,7 +29,7 @@ export default function SeoSection() {
   return (
     <section
       className="w-full bg-[#0d1208] border-t border-white/5 py-14 px-4"
-      aria-label="About BBQ Pro Cook Calculator"
+      aria-label="About Rough Cut BBQ Cook Calculator"
     >
       <div className="max-w-2xl mx-auto flex flex-col gap-12">
 
@@ -39,9 +39,9 @@ export default function SeoSection() {
             The free BBQ cook calculator for pitmasters
           </h2>
           <p className="text-white/60 text-sm leading-relaxed max-w-lg mx-auto">
-            BBQ Pro calculates exact cook times, rest periods, and internal temperatures
+            Rough Cut BBQ calculates exact cook times, rest periods, and internal temperatures
             for any cut — brisket, ribs, pulled pork, chicken, fish, and more.
-            Whether you're smoking low and slow or grilling hot and fast, we've got your plan.
+            Whether you&apos;re smoking low and slow or grilling hot and fast, we&apos;ve got your plan.
           </p>
         </div>
 

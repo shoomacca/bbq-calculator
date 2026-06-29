@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Node.js automation scripts — CommonJS, not app source
     "scripts/**",
+    "tmp/**",
+    "split_images.js",
+    "android/**",
   ]),
 ]);
 

@@ -43,8 +43,6 @@ function isTouch() {
 export default function ScrollCarousel({
   items,
   onSelect,
-  title,
-  subtitle,
   onBack,
   ctaPrefix = 'Choose',
 }: Props) {

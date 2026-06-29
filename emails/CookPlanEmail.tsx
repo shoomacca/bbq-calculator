@@ -60,7 +60,7 @@ export default function CookPlanEmail({
 
           {/* Header */}
           <Heading style={{ color: '#f59e0b', fontSize: 28, fontWeight: 800, margin: '0 0 4px' }}>
-            🔥 Your BBQ Pro Cook Plan
+            🔥 Your Rough Cut BBQ Cook Plan
           </Heading>
           <Text style={{ color: '#9ca3af', fontSize: 14, margin: '0 0 32px' }}>
             Everything you need for a perfect cook.
@@ -95,7 +95,7 @@ export default function CookPlanEmail({
 
           {/* Footer */}
           <Text style={{ color: '#6b7280', fontSize: 12, margin: '0 0 8px', lineHeight: 1.6 }}>
-            You&apos;re receiving this because you asked BBQ Pro to email your cook plan.
+            You&apos;re receiving this because you asked Rough Cut BBQ to email your cook plan.
           </Text>
           <Link href={unsubscribe_url} style={{ color: '#6b7280', fontSize: 12 }}>
             Unsubscribe

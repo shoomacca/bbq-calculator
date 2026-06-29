@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense, useLayoutEffect } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCalculator } from '@/lib/useCalculator';
 import { calculateCook, getMeatCategories } from '@/lib/calculator';
@@ -79,11 +79,6 @@ function CalculatorInner() {
     if (pre && state.step === 1) router.push('/');
     else goBack();
   };
-
-  const isCarouselStep =
-    (!pre && state.step === 1) ||
-    ((pre && state.step === 1) || (!pre && state.step === 2)) ||
-    (((pre && state.step === 2) || (!pre && state.step === 3)) && state.method && state.categoryId);
 
   return (
     <div className="flex flex-col flex-1">

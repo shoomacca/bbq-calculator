@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'BBQ Guides — BBQ Pro',
+  title: 'BBQ Guides — Rough Cut BBQ',
   description: 'Step-by-step guides for smoking brisket, ribs, pork shoulder, chicken, and more.',
 };
 
