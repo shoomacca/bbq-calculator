@@ -7,7 +7,7 @@ import pool from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'gallery');
-const BASE_URL = 'https://bbq.bsbsbs.au/uploads/gallery';
+const BASE_URL = 'https://app.roughcut.com.au/uploads/gallery';
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
 

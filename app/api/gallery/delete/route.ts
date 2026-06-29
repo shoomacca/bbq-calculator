@@ -4,7 +4,7 @@ import path from 'path';
 import { RowDataPacket } from 'mysql2';
 import pool from '@/lib/db';
 
-const BASE_URL = 'https://bbq.bsbsbs.au/uploads/gallery';
+const BASE_URL = 'https://app.roughcut.com.au/uploads/gallery';
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'gallery');
 
 interface PostRow extends RowDataPacket {

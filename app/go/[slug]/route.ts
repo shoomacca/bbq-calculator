@@ -24,7 +24,7 @@ export async function GET(
 
   // If no product found or placeholder URL, send to gear page
   if (!affiliateUrl || affiliateUrl === '#') {
-    return NextResponse.redirect(new URL('/gear', 'https://bbq.bsbsbs.au'));
+    return NextResponse.redirect(new URL('/gear', 'https://app.roughcut.com.au'));
   }
 
   return NextResponse.redirect(affiliateUrl);
