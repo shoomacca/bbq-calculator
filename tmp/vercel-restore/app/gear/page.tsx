@@ -1,92 +1,93 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { GEAR, GEAR_CATEGORIES, type GearItem } from '@/data/gear';
 
-interface GearItem {
-  id: number;
-  slug: string;
-  name: string;
-  category: string;
-  affiliate_url: string;
-  image_url: string | null;
-  description: string | null;
-  recommended_for: string | null;
-  sort_order: number;
-}
+/* ── Lazy-loaded product image ─────────────────────────────────────────────── */
+function ProductImage({ url, fallback }: { url: string; fallback: string }) {
+  const [src, setSrc] = useState<string | null>(null);
 
-const CATEGORY_ORDER = [
-  'Thermometers',
-  'Smokers',
-  'Charcoal & Fuel',
-  'Rubs & Seasonings',
-  'Accessories',
-];
+  useEffect(() => {
+    fetch(`/api/og-image?url=${encodeURIComponent(url)}`)
+      .then((r) => r.json())
+      .then(({ image }) => setSrc(image ?? ''))
+      .catch(() => setSrc(''));
+  }, [url]);
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  'Thermometers': '🌡️',
-  'Smokers': '🔥',
-  'Charcoal & Fuel': '🪨',
-  'Rubs & Seasonings': '🧂',
-  'Accessories': '🛠️',
-};
+  if (src === null) {
+    // loading
+    return (
+      <div className="w-20 h-20 rounded-xl bg-brand-dark flex items-center justify-center flex-shrink-0 animate-pulse" />
+    );
+  }
 
-function SkeletonCard() {
+  if (src) {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={src}
+        alt=""
+        className="w-20 h-20 rounded-xl object-contain bg-white flex-shrink-0"
+      />
+    );
+  }
+
   return (
-    <div className="bg-brand-surface rounded-xl p-4 flex flex-col gap-3 animate-pulse">
-      <div className="h-4 bg-white/10 rounded w-3/4" />
-      <div className="h-3 bg-white/5 rounded w-full" />
-      <div className="h-3 bg-white/5 rounded w-2/3" />
-      <div className="h-8 bg-white/5 rounded-lg w-24 mt-1" />
+    <div className="w-20 h-20 rounded-xl bg-brand-dark flex items-center justify-center flex-shrink-0">
+      <span className="text-4xl">{fallback}</span>
     </div>
   );
 }
 
-function GearCard({ item }: { item: GearItem }) {
+/* ── Category emoji map ─────────────────────────────────────────────────────── */
+const CAT_EMOJI: Record<string, string> = {
+  'Thermometers':        '🌡️',
+  'Tools & Accessories': '🛠️',
+  'Safety & Protection': '🧤',
+  'Charcoal & Wood':     '🪵',
+  'Rubs & Seasonings':   '🧂',
+  'Cookware':            '🍳',
+};
+
+function GearRow({ item }: { item: GearItem }) {
   return (
-    <div className="bg-brand-surface border border-white/8 rounded-xl p-4 flex flex-col gap-2">
-      <p className="text-brand-text font-semibold text-sm leading-snug">{item.name}</p>
-      {item.description && (
-        <p className="text-brand-muted text-xs leading-relaxed line-clamp-2">{item.description}</p>
-      )}
-      <div className="mt-auto pt-2">
-        <a
-          href={`/go/${item.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-opacity hover:opacity-80"
+    <a
+      href={item.affiliateUrl}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      className="group flex items-center gap-4 bg-brand-surface border border-white/8 rounded-xl px-4 py-4 hover:border-white/20 hover:bg-brand-surface/80 transition-all"
+    >
+      <ProductImage url={item.affiliateUrl} fallback={CAT_EMOJI[item.category] ?? '🛒'} />
+
+      <div className="flex-1 min-w-0">
+        <p className="text-brand-text font-semibold text-sm leading-snug group-hover:text-brand-secondary transition-colors">
+          {item.name}
+        </p>
+        <p className="text-brand-muted text-xs mt-1 leading-relaxed line-clamp-2">
+          {item.description}
+        </p>
+      </div>
+
+      <div className="flex-shrink-0">
+        <span
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white whitespace-nowrap"
           style={{ background: '#f97316' }}
         >
           Shop →
-        </a>
+        </span>
       </div>
-    </div>
+    </a>
   );
 }
 
 export default function GearPage() {
-  const [gear, setGear] = useState<GearItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState<string>('All');
-
-  useEffect(() => {
-    fetch('/api/gear')
-      .then((r) => r.json())
-      .then(({ gear }) => { setGear(gear ?? []); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, []);
-
-  // Build category list from loaded data, preserving order
-  const categories = useMemo(() => {
-    const present = new Set(gear.map((g) => g.category));
-    return ['All', ...CATEGORY_ORDER.filter((c) => present.has(c))];
-  }, [gear]);
+  const [activeCategory, setActiveCategory] = useState('All');
 
   const filtered = useMemo(
-    () => activeCategory === 'All' ? gear : gear.filter((g) => g.category === activeCategory),
-    [gear, activeCategory]
+    () => activeCategory === 'All' ? GEAR : GEAR.filter((g) => g.category === activeCategory),
+    [activeCategory]
   );
 
-  // Group by category for the "All" view
   const grouped = useMemo(() => {
     if (activeCategory !== 'All') return null;
     const map: Record<string, GearItem[]> = {};
@@ -98,77 +99,56 @@ export default function GearPage() {
   }, [filtered, activeCategory]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-
-      {/* Header */}
+    <div className="max-w-2xl mx-auto px-4 py-6">
       <div className="mb-6">
         <h1 className="text-brand-text text-2xl font-bold">BBQ Gear</h1>
         <p className="text-brand-muted text-sm mt-1">
-          Kit we recommend — every link supports BBQ Pro
+          Kit we actually recommend — every link supports BBQ Calculator
         </p>
       </div>
 
       {/* Category tabs */}
-      {!loading && (
-        <div className="flex gap-2 flex-wrap mb-6">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
-              style={{
-                background: activeCategory === cat ? '#f97316' : 'rgba(255,255,255,0.07)',
-                color: activeCategory === cat ? 'white' : undefined,
-                border: activeCategory === cat ? 'none' : '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
-              {cat !== 'All' && CATEGORY_EMOJI[cat] ? `${CATEGORY_EMOJI[cat]} ` : ''}{cat}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-2 flex-wrap mb-6">
+        {GEAR_CATEGORIES.map(({ id, emoji }) => (
+          <button
+            key={id}
+            onClick={() => setActiveCategory(id)}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+            style={{
+              background: activeCategory === id ? '#f97316' : 'rgba(255,255,255,0.07)',
+              color: activeCategory === id ? 'white' : undefined,
+              border: activeCategory === id ? 'none' : '1px solid rgba(255,255,255,0.12)',
+            }}
+          >
+            {emoji ? `${emoji} ` : ''}{id}
+          </button>
+        ))}
+      </div>
 
-      {/* Loading skeletons */}
-      {loading && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
-        </div>
-      )}
-
-      {/* All categories view — grouped with section headers */}
-      {!loading && grouped && (
+      {/* All — grouped with section headers */}
+      {grouped && (
         <div className="flex flex-col gap-10">
-          {CATEGORY_ORDER.filter((cat) => grouped[cat]?.length).map((cat) => (
-            <section key={cat}>
-              <h2 className="text-brand-text font-bold text-base mb-4">
-                {CATEGORY_EMOJI[cat]} {cat}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {grouped[cat].map((item) => (
-                  <GearCard key={item.id} item={item} />
-                ))}
+          {GEAR_CATEGORIES.slice(1).filter(({ id }) => grouped[id]?.length).map(({ id, emoji }) => (
+            <section key={id}>
+              <h2 className="text-brand-text font-bold text-base mb-3">{emoji} {id}</h2>
+              <div className="flex flex-col gap-3">
+                {grouped[id].map((item) => <GearRow key={item.slug} item={item} />)}
               </div>
             </section>
           ))}
         </div>
       )}
 
-      {/* Single category view — flat grid */}
-      {!loading && !grouped && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {filtered.map((item) => (
-            <GearCard key={item.id} item={item} />
-          ))}
+      {/* Single category — flat list */}
+      {!grouped && (
+        <div className="flex flex-col gap-3">
+          {filtered.map((item) => <GearRow key={item.slug} item={item} />)}
         </div>
       )}
 
-      {/* Affiliate disclosure */}
-      {!loading && (
-        <p className="text-brand-muted/40 text-xs text-center mt-12">
-          BBQ Pro may earn a commission from qualifying purchases via links on this page.
-        </p>
-      )}
-
+      <p className="text-brand-muted/40 text-xs text-center mt-12">
+        BBQ Calculator earns a commission from qualifying Amazon purchases via links on this page.
+      </p>
     </div>
   );
 }

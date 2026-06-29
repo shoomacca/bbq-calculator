@@ -144,8 +144,8 @@ export function calculateCook(input: CalculatorInput): CalculatorResult {
     donenessCue: cut.donenessCue,
     preheatTempC: cut.preheatTempC,
     milestones,
-    rubs: (cut as any).rubs ?? [(cut as any).rub ?? ''],
-    woods: (cut as any).woods ?? ((cut as any).wood ? [(cut as any).wood] : []),
-    tips: (cut as any).tips ?? [(cut as any).notes ?? ''],
+    rubs: cut.rubs || [],
+    woods: cut.woods || [],
+    tips: cut.tips || [],
   };
 }

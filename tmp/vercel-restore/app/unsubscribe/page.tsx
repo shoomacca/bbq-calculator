@@ -34,7 +34,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
             <div className="text-5xl">✓</div>
             <h1 className="text-2xl font-bold text-amber-400">You&apos;ve been unsubscribed</h1>
             <p className="text-brand-muted">
-              You won&apos;t receive any more cook plan emails from BBQ Pro.
+              You won&apos;t receive any more cook plan emails from Rough Cut BBQ.
             </p>
           </>
         )}

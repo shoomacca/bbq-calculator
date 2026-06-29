@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Your Cook Plan | BBQ Pro',
+  title: 'Your Cook Plan | Rough Cut BBQ',
   description: 'Your personalised BBQ cook plan with times, temperatures, and milestones.',
 };
 

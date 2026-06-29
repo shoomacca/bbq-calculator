@@ -16,18 +16,18 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
     : ['Category', 'Method', 'Cut', 'Weight'];
 
   return (
-    <div className="flex items-center gap-2 mb-8 px-4">
+    <div className="flex items-center gap-2">
       {labels.map((label, i) => {
         const stepNum = i + 1;
-        const isDone = stepNum < current;
+        const isDone   = stepNum < current;
         const isActive = stepNum === current;
         return (
           <div key={label} className="flex items-center gap-2 flex-1 last:flex-none">
             <div className="flex flex-col items-center gap-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                isDone    ? 'bg-brand-primary text-white' :
-                isActive  ? 'bg-brand-primary/20 border-2 border-brand-primary text-brand-primary' :
-                            'bg-brand-surface border-2 border-brand-muted/20 text-brand-muted'
+                isDone   ? 'bg-brand-primary text-white' :
+                isActive ? 'bg-brand-primary/20 border-2 border-brand-primary text-brand-primary' :
+                           'bg-brand-surface border-2 border-brand-muted/20 text-brand-muted'
               }`}>
                 {isDone ? '✓' : stepNum}
               </div>
@@ -61,12 +61,7 @@ function CalculatorInner() {
 
   const handleWeightSubmit = (weightKg: number) => {
     if (!state.method || !state.categoryId || !state.cutId) return;
-    const input = {
-      method: state.method,
-      categoryId: state.categoryId,
-      cutId: state.cutId,
-      weightKg,
-    };
+    const input = { method: state.method, categoryId: state.categoryId, cutId: state.cutId, weightKg };
     const result = calculateCook(input);
     saveResult(result);
     saveInput(input);
@@ -81,19 +76,23 @@ function CalculatorInner() {
   })();
 
   const handleBack = () => {
-    if (pre && state.step === 1) {
-      router.push('/');
-    } else {
-      goBack();
-    }
+    if (pre && state.step === 1) router.push('/');
+    else goBack();
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-6 flex flex-col flex-1">
-      <ProgressBar current={state.step} total={totalSteps} />
+    <div className="flex flex-col flex-1">
+      {/* ── Progress bar — constrained, padded ─────────────────────────── */}
+      <div className="max-w-2xl mx-auto w-full px-4 pt-4 pb-3">
+        <ProgressBar current={state.step} total={totalSteps} />
+      </div>
 
-      <div className="flex-1 flex flex-col">
-        {/* Free mode: step 1 = category */}
+      {/* ── Step content — vertically centred in remaining page space ──── */}
+      {/* Carousel steps: full width so calc(50% - halfCard) = 50% of viewport */}
+      {/* Weight step: constrained and centred */}
+      <div className="flex-1 flex flex-col justify-center">
+
+        {/* Step 1 (free mode): category carousel — full width */}
         {!pre && state.step === 1 && (
           <CategoryStep
             method={null}
@@ -103,7 +102,7 @@ function CalculatorInner() {
           />
         )}
 
-        {/* Method step */}
+        {/* Method carousel — full width */}
         {((pre && state.step === 1) || (!pre && state.step === 2)) && (
           <MethodStep
             selected={state.method}
@@ -113,7 +112,7 @@ function CalculatorInner() {
           />
         )}
 
-        {/* Cut step */}
+        {/* Cut carousel — full width */}
         {((pre && state.step === 2) || (!pre && state.step === 3)) && state.method && state.categoryId && (
           <CutStep
             method={state.method}
@@ -124,14 +123,16 @@ function CalculatorInner() {
           />
         )}
 
-        {/* Weight step */}
+        {/* Weight step — constrained */}
         {((pre && state.step === 3) || (!pre && state.step === 4)) && (
-          <WeightStep
-            cutName={cutName}
-            initialWeight={state.weightKg}
-            onSubmit={handleWeightSubmit}
-            onBack={handleBack}
-          />
+          <div className="max-w-2xl mx-auto w-full px-4 pb-8 flex-1 flex flex-col justify-center">
+            <WeightStep
+              cutName={cutName}
+              initialWeight={state.weightKg}
+              onSubmit={handleWeightSubmit}
+              onBack={handleBack}
+            />
+          </div>
         )}
       </div>
     </div>
