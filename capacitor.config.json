@@ -4,7 +4,7 @@
   "webDir": "public",
   "bundledWebRuntime": false,
   "server": {
-    "url": "https://bbq.bsbsbs.au",
+    "url": "https://app.roughcut.com.au",
     "cleartext": true
   }
 }
