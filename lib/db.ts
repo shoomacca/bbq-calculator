@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import mysql from 'mysql2/promise';
+import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 
-// Initial Gear Seed Data (from 005_gear_seed.sql)
+// Initial Gear Seed Data
 const INITIAL_GEAR = [
   { id: 1, slug: 'thermapen-one', name: 'Thermapen ONE', category: 'Thermometers', affiliate_url: '#', description: 'Instant-read thermometer — reads in 1 second. The gold standard for BBQ.', recommended_for: 'all', sort_order: 1 },
   { id: 2, slug: 'meater-plus', name: 'MEATER+', category: 'Thermometers', affiliate_url: '#', description: 'Wireless smart probe — monitor from your phone up to 50m away.', recommended_for: 'Smoker,Kamado,Oven', sort_order: 2 },
@@ -99,304 +100,237 @@ class LocalDBProxy {
     return this.query<T>(sql, params);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async query<T = any>(sql: string, params: any[] = []): Promise<[any, any]> {
     const db = this.read();
-    const cleanSql = sql.replace(/\s+/g, ' ').trim();
+    const queryLower = sql.toLowerCase().trim();
 
-    // 1. SELECT count FROM cook_tally WHERE id = 1
-    if (/SELECT\s+count\s+FROM\s+cook_tally/i.test(cleanSql)) {
-      return [[{ count: db.cook_tally[0]?.count ?? 0 }], null];
+    // 1. SELECT count FROM cook_tally
+    if (queryLower.includes('select count from cook_tally') || queryLower.includes('select * from cook_tally')) {
+      return [db.cook_tally as any as T, null];
     }
 
-    // 2. UPDATE cook_tally SET count = count + 1 WHERE id = 1
-    if (/UPDATE\s+cook_tally\s+SET\s+count\s+=\s+count\s+\+\s+1/i.test(cleanSql)) {
-      if (db.cook_tally[0]) {
-        db.cook_tally[0].count += 1;
-        db.cook_tally[0].updated_at = new Date().toISOString();
-        this.write(db);
+    // 2. UPDATE cook_tally SET count = count + 1
+    if (queryLower.includes('update cook_tally set count = count + 1')) {
+      if (db.cook_tally.length === 0) {
+        db.cook_tally.push({ id: 1, count: 0, updated_at: new Date().toISOString() });
       }
-      return [{}, null];
-    }
-
-    // 3. SELECT name, slug, recommended_for FROM gear ORDER BY sort_order ASC
-    if (/SELECT\s+name,\s*slug,\s*recommended_for\s+FROM\s+gear\s+ORDER\s+BY\s+sort_order\s+ASC/i.test(cleanSql)) {
-      const rows = db.gear.map(({ name, slug, recommended_for }) => ({ name, slug, recommended_for }));
-      return [rows, null];
-    }
-
-    // 4. SELECT * FROM gear
-    if (/SELECT\s+\*\s+FROM\s+gear/i.test(cleanSql)) {
-      let rows = [...db.gear];
-      // WHERE category = ?
-      const categoryMatch = /WHERE\s+category\s+=\s+\?/i.test(cleanSql);
-      if (categoryMatch) {
-        const catVal = params[0];
-        rows = rows.filter(g => g.category === catVal);
-      }
-      // ORDER BY sort_order ASC LIMIT ?
-      rows.sort((a, b) => a.sort_order - b.sort_order);
-      const limitMatch = /LIMIT\s+(\?|\d+)/i.exec(cleanSql);
-      if (limitMatch) {
-        const limitVal = limitMatch[1] === '?' ? params[params.length - 1] : parseInt(limitMatch[1], 10);
-        if (typeof limitVal === 'number') {
-          rows = rows.slice(0, limitVal);
-        }
-      }
-      return [rows, null];
-    }
-
-    // 5. SELECT affiliate_url FROM gear WHERE slug = ?
-    if (/SELECT\s+affiliate_url\s+FROM\s+gear\s+WHERE\s+slug\s+=\s+\?/i.test(cleanSql)) {
-      const slugVal = params[0];
-      const match = db.gear.find(g => g.slug === slugVal);
-      return [[match ? { affiliate_url: match.affiliate_url } : undefined].filter(Boolean), null];
-    }
-
-    // 6. INSERT INTO gear_clicks
-    if (/INSERT\s+INTO\s+gear_clicks/i.test(cleanSql)) {
-      const slugVal = params[0];
-      db.gear_clicks.push({
-        id: db.gear_clicks.length + 1,
-        gear_slug: slugVal,
-        clicked_at: new Date().toISOString()
-      });
+      db.cook_tally[0].count += 1;
+      db.cook_tally[0].updated_at = new Date().toISOString();
       this.write(db);
-      return [{}, null];
+      return [ { affectedRows: 1 } as any as T, null ];
     }
 
-    // 7. SELECT * FROM gallery_posts
-    if (/SELECT\s+.*FROM\s+gallery_posts/i.test(cleanSql)) {
-      let rows = [...db.gallery_posts];
-      
-      const isFlaggedQuery = /WHERE\s+report_count\s+>\s+0\s+ORDER\s+BY\s+report_count\s+DESC/i.test(cleanSql);
-      if (isFlaggedQuery) {
-        rows = rows.filter(p => p.report_count > 0);
-        rows.sort((a, b) => b.report_count - a.report_count);
-      } else {
-        rows = rows.filter(p => p.reported === 0);
-        // Check filtering parameters
-        let paramIdx = 0;
-        if (/AND\s+method\s+=\s+\?/i.test(cleanSql)) {
-          const methodVal = params[paramIdx++];
-          rows = rows.filter(p => p.method === methodVal);
-        }
-        if (/AND\s+cut\s+=\s+\?/i.test(cleanSql)) {
-          const cutVal = params[paramIdx++];
-          rows = rows.filter(p => p.cut === cutVal);
-        }
-        rows.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      }
-      
-      // Limit
-      const limitMatch = /LIMIT\s+(\d+)/i.exec(cleanSql);
-      if (limitMatch) {
-        rows = rows.slice(0, parseInt(limitMatch[1], 10));
-      }
-      
-      // Map counts
-      const mappedRows = rows.map(p => {
-        const starCount = (db.post_stars || []).filter(s => s.post_id === p.id).length;
-        const commentCount = (db.post_comments || []).filter(c => c.post_id === p.id).length;
-        return {
-          ...p,
-          star_count: starCount,
-          comment_count: commentCount
-        };
-      });
-      return [mappedRows, null];
+    // 3. SELECT FROM users WHERE email = ?
+    if (queryLower.includes('select id, password_hash, email from users') || queryLower.includes('select id from users')) {
+      const email = params[0];
+      const found = db.users.filter(u => u.email === email);
+      return [found as any as T, null];
     }
 
-    // 8. SELECT before_url, after_url FROM gallery_posts WHERE id = ?
-    if (/SELECT\s+before_url,\s*after_url\s+FROM\s+gallery_posts\s+WHERE\s+id\s+=\s+\?/i.test(cleanSql)) {
-      const idVal = params[0];
-      const match = db.gallery_posts.find(p => p.id === idVal);
-      return [match ? [{ before_url: match.before_url, after_url: match.after_url }] : [], null];
-    }
-
-    // 9. INSERT INTO gallery_posts
-    if (/INSERT\s+INTO\s+gallery_posts/i.test(cleanSql)) {
-      const [id, before_url, after_url, name, cut, method, gear_used, user_id] = params;
-      db.gallery_posts.push({
-        id, before_url, after_url, name, cut, method, gear_used,
-        user_id: user_id !== undefined ? user_id : null,
-        report_count: 0, reported: 0, created_at: new Date().toISOString()
-      });
+    // 4. INSERT INTO users
+    if (queryLower.includes('insert into users')) {
+      const email = params[0];
+      const passwordHash = params[1];
+      const newId = db.users.length + 1;
+      db.users.push({ id: newId, email, password_hash: passwordHash, created_at: new Date().toISOString() });
       this.write(db);
-      return [{}, null];
+      return [{ insertId: newId, affectedRows: 1 } as any as T, null];
     }
 
-    // 9a. SELECT post_id FROM post_stars WHERE user_id = ?
-    if (/SELECT\s+post_id\s+FROM\s+post_stars\s+WHERE\s+user_id\s+=\s+\?/i.test(cleanSql)) {
-      const [userIdVal] = params;
-      const list = (db.post_stars || []).filter(s => s.user_id === userIdVal);
-      return [list, null];
+    // 5. SELECT FROM gear
+    if (queryLower.includes('select name, slug, recommended_for from gear') || queryLower.includes('select * from gear')) {
+      return [db.gear as any as T, null];
     }
 
-    // 9b. INSERT INTO post_stars
-    if (/INSERT\s+INTO\s+post_stars/i.test(cleanSql)) {
-      const [userIdVal, postIdVal] = params;
-      if (!db.post_stars) db.post_stars = [];
-      const exists = db.post_stars.some(s => s.user_id === userIdVal && s.post_id === postIdVal);
-      if (!exists) {
-        db.post_stars.push({ user_id: userIdVal, post_id: postIdVal });
-        this.write(db);
-      }
-      return [{}, null];
+    // 6. SELECT FROM gear WHERE slug = ?
+    if (queryLower.includes('select affiliate_url from gear where slug = ?')) {
+      const slug = params[0];
+      const item = db.gear.filter(g => g.slug === slug);
+      return [item as any as T, null];
     }
 
-    // 9c. DELETE FROM post_stars WHERE user_id = ? AND post_id = ?
-    if (/DELETE\s+FROM\s+post_stars\s+WHERE\s+user_id\s+=\s+\?\s+AND\s+post_id\s+=\s+\?/i.test(cleanSql)) {
-      const [userIdVal, postIdVal] = params;
-      if (!db.post_stars) db.post_stars = [];
-      db.post_stars = db.post_stars.filter(s => !(s.user_id === userIdVal && s.post_id === postIdVal));
+    // 7. INSERT INTO gear_clicks
+    if (queryLower.includes('insert into gear_clicks')) {
+      const slug = params[0];
+      db.gear_clicks.push({ gear_slug: slug, clicked_at: new Date().toISOString() });
       this.write(db);
-      return [{}, null];
+      return [ { affectedRows: 1 } as any as T, null ];
     }
 
-    // 9d. SELECT * FROM post_comments WHERE post_id = ? ORDER BY created_at ASC
-    if (/SELECT\s+.*FROM\s+post_comments/i.test(cleanSql)) {
-      const [postIdVal] = params;
-      if (!db.post_comments) db.post_comments = [];
-      const list = db.post_comments
-        .filter(c => c.post_id === postIdVal)
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-      return [list, null];
+    // 8. SELECT FROM saved_cooks WHERE user_id = ?
+    if (queryLower.includes('select id, user_id, session_id, method, meat_category, cut, weight_kg, result_json, created_at from saved_cooks')) {
+      const userId = params[0];
+      const found = db.saved_cooks.filter(c => c.user_id === userId);
+      return [found as any as T, null];
     }
 
-    // 9e. INSERT INTO post_comments
-    if (/INSERT\s+INTO\s+post_comments/i.test(cleanSql)) {
-      const [postIdVal, userIdVal, textVal] = params;
-      if (!db.post_comments) db.post_comments = [];
-      const newComment = {
-        id: db.post_comments.length + 1,
-        post_id: postIdVal,
-        user_id: userIdVal,
-        comment_text: textVal,
-        created_at: new Date().toISOString()
-      };
-      db.post_comments.push(newComment);
-      this.write(db);
-      return [{ insertId: newComment.id }, null];
-    }
-
-    // 10. UPDATE gallery_posts SET report_count = report_count + 1...
-    if (/UPDATE\s+gallery_posts\s+SET\s+report_count/i.test(cleanSql)) {
-      const idVal = params[0];
-      const match = db.gallery_posts.find(p => p.id === idVal);
-      if (match) {
-        match.report_count += 1;
-        match.reported = match.report_count >= 3 ? 1 : 0;
-        this.write(db);
-      }
-      return [{}, null];
-    }
-
-    // 11. DELETE FROM gallery_posts WHERE id = ?
-    if (/DELETE\s+FROM\s+gallery_posts\s+WHERE\s+id\s+=\s+\?/i.test(cleanSql)) {
-      const idVal = params[0];
-      db.gallery_posts = db.gallery_posts.filter(p => p.id !== idVal);
-      this.write(db);
-      return [{}, null];
-    }
-
-    // 12. INSERT INTO subscribers
-    if (/INSERT\s+INTO\s+subscribers/i.test(cleanSql)) {
-      const [email, cut, method, weight_kg, cook_time_minutes, appliance_temp_c, internal_temp_c, unsubscribe_token] = params;
-      // Unique check
-      if (db.subscribers.some(s => s.email === email)) {
-        const err: any = new Error('Duplicate entry');
-        err.code = 'ER_DUP_ENTRY';
-        throw err;
-      }
-      db.subscribers.push({
-        id: db.subscribers.length + 1,
-        email, cut, method, weight_kg, cook_time_minutes, appliance_temp_c, internal_temp_c, unsubscribe_token,
-        created_at: new Date().toISOString(),
-        unsubscribed_at: null
-      });
-      this.write(db);
-      return [{}, null];
-    }
-
-    // 13. SELECT id, unsubscribed_at FROM subscribers WHERE unsubscribe_token = ?
-    if (/SELECT\s+id,\s*unsubscribed_at\s+FROM\s+subscribers\s+WHERE\s+unsubscribe_token\s+=\s+\?/i.test(cleanSql)) {
-      const tokenVal = params[0];
-      const match = db.subscribers.find(s => s.unsubscribe_token === tokenVal);
-      return [match ? [{ id: match.id, unsubscribed_at: match.unsubscribed_at }] : [], null];
-    }
-
-    // 14. UPDATE subscribers SET unsubscribed_at = NOW()...
-    if (/UPDATE\s+subscribers\s+SET\s+unsubscribed_at\s+=\s+NOW\(\)/i.test(cleanSql)) {
-      const tokenVal = params[0];
-      const match = db.subscribers.find(s => s.unsubscribe_token === tokenVal);
-      if (match) {
-        match.unsubscribed_at = new Date().toISOString();
-        this.write(db);
-      }
-      return [{}, null];
-    }
-
-    // 15. SELECT * FROM users WHERE email = ?
-    if (/SELECT\s+\*\s+FROM\s+users\s+WHERE\s+email\s+=\s+\?/i.test(cleanSql)) {
-      const emailVal = params[0];
-      const match = db.users.find(u => u.email.toLowerCase() === emailVal.toLowerCase());
-      return [match ? [match] : [], null];
-    }
-
-    // 16. INSERT INTO users
-    if (/INSERT\s+INTO\s+users\s+\(email,\s*password_hash\)/i.test(cleanSql)) {
-      const [email, password_hash] = params;
-      const id = db.users.length + 1;
-      db.users.push({
-        id, email, password_hash, created_at: new Date().toISOString()
-      });
-      this.write(db);
-      return [{ insertId: id }, null];
-    }
-
-    // 17. SELECT * FROM saved_cooks WHERE user_id = ?
-    if (/SELECT\s+\*\s+FROM\s+saved_cooks\s+WHERE\s+user_id\s+=\s+\?/i.test(cleanSql)) {
-      const userIdVal = params[0];
-      const rows = db.saved_cooks.filter(c => c.user_id === userIdVal);
-      rows.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      return [rows, null];
-    }
-
-    // 18. INSERT INTO saved_cooks
-    if (/INSERT\s+INTO\s+saved_cooks\s+\(user_id,\s*method,\s*meat_category,\s*cut,\s*weight_kg,\s*result_json\)/i.test(cleanSql)) {
-      const [user_id, method, meat_category, cut, weight_kg, result_json] = params;
-      const id = db.saved_cooks.length + 1;
+    // 9. INSERT INTO saved_cooks
+    if (queryLower.includes('insert into saved_cooks')) {
+      const userId = params[0];
+      const sessionId = params[1];
+      const method = params[2];
+      const meatCategory = params[3];
+      const cut = params[4];
+      const weight = params[5];
+      const resultJson = params[6];
+      const newId = db.saved_cooks.length + 1;
       db.saved_cooks.push({
-        id,
-        user_id,
-        session_id: 'local-session',
+        id: newId,
+        user_id: userId,
+        session_id: sessionId,
         method,
-        meat_category,
+        meat_category: meatCategory,
         cut,
-        weight_kg,
-        result_json,
-        created_at: new Date().toISOString()
+        weight_kg: weight,
+        result_json: resultJson,
+        created_at: new Date().toISOString(),
       });
       this.write(db);
-      return [{ insertId: id }, null];
+      return [{ insertId: newId, affectedRows: 1 } as any as T, null];
     }
 
-    // 19. UPDATE saved_cooks SET result_json = ?
-    if (/UPDATE\s+saved_cooks\s+SET\s+result_json\s+=\s+\?\s+WHERE\s+id\s+=\s+\?\s+AND\s+user_id\s+=\s+\?/i.test(cleanSql)) {
-      const [result_json, idVal, userIdVal] = params;
-      const match = db.saved_cooks.find(c => c.id === idVal && c.user_id === userIdVal);
-      if (match) {
-        match.result_json = result_json;
+    // 10. UPDATE saved_cooks SET result_json = ?
+    if (queryLower.includes('update saved_cooks set result_json')) {
+      const resultJson = params[0];
+      const id = params[1];
+      const userId = params[2];
+      const idx = db.saved_cooks.findIndex(c => c.id === id && c.user_id === userId);
+      if (idx !== -1) {
+        db.saved_cooks[idx].result_json = resultJson;
         this.write(db);
+        return [{ affectedRows: 1 } as any as T, null];
       }
+      return [{ affectedRows: 0 } as any as T, null];
+    }
+
+    // 11. DELETE FROM saved_cooks WHERE id = ?
+    if (queryLower.includes('delete from saved_cooks where id = ?')) {
+      const id = params[0];
+      const userId = params[1];
+      const initialLen = db.saved_cooks.length;
+      db.saved_cooks = db.saved_cooks.filter(c => !(c.id === id && c.user_id === userId));
+      this.write(db);
+      return [{ affectedRows: initialLen - db.saved_cooks.length } as any as T, null];
+    }
+
+    // 12. SELECT FROM subscribers
+    if (queryLower.includes('select id from subscribers')) {
+      const email = params[0];
+      const found = db.subscribers.filter(s => s.email === email);
+      return [found as any as T, null];
+    }
+
+    // 13. INSERT INTO subscribers
+    if (queryLower.includes('insert into subscribers')) {
+      const email = params[0];
+      const name = params[1];
+      const newId = db.subscribers.length + 1;
+      db.subscribers.push({ id: newId, email, name, status: 'subscribed', created_at: new Date().toISOString() });
+      this.write(db);
+      return [{ insertId: newId, affectedRows: 1 } as any as T, null];
+    }
+
+    // 14. UPDATE subscribers SET status = 'unsubscribed'
+    if (queryLower.includes('update subscribers set status =')) {
+      const email = params[0];
+      const idx = db.subscribers.findIndex(s => s.email === email);
+      if (idx !== -1) {
+        db.subscribers[idx].status = 'unsubscribed';
+        db.subscribers[idx].unsubscribed_at = new Date().toISOString();
+        this.write(db);
+        return [{ affectedRows: 1 } as any as T, null];
+      }
+      return [{ affectedRows: 0 } as any as T, null];
+    }
+
+    // 15. SELECT FROM gallery_posts (Forum Feed)
+    if (queryLower.includes('select p.id, p.before_url, p.after_url, p.name, p.cut, p.method, p.gear_used, p.created_at')) {
+      const currentUserId = params[0]; // Used to calculate starred status
+      const posts = db.gallery_posts.filter(p => !p.reported).sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      const mapped = posts.map(p => {
+        const starCount = db.post_stars.filter(s => s.post_id === p.id).length;
+        const starred = db.post_stars.some(s => s.post_id === p.id && s.user_id === currentUserId) ? 1 : 0;
+        return { ...p, star_count: starCount, starred };
+      });
+      return [mapped as any as T, null];
+    }
+
+    // 16. INSERT INTO gallery_posts
+    if (queryLower.includes('insert into gallery_posts')) {
+      const id = params[0];
+      const beforeUrl = params[1];
+      const afterUrl = params[2];
+      const name = params[3];
+      const cut = params[4];
+      const method = params[5];
+      const gearUsed = params[6];
+      const userId = params[7];
+      db.gallery_posts.push({
+        id,
+        before_url: beforeUrl,
+        after_url: afterUrl,
+        name,
+        cut,
+        method,
+        gear_used: gearUsed,
+        user_id: userId,
+        report_count: 0,
+        reported: 0,
+        created_at: new Date().toISOString(),
+      });
+      this.write(db);
       return [{}, null];
     }
 
-    // 20. DELETE FROM saved_cooks WHERE id = ? AND user_id = ?
-    if (/DELETE\s+FROM\s+saved_cooks\s+WHERE\s+id\s+=\s+\?\s+AND\s+user_id\s+=\s+\?/i.test(cleanSql)) {
-      const [idVal, userIdVal] = params;
-      db.saved_cooks = db.saved_cooks.filter(c => !(c.id === idVal && c.user_id === userIdVal));
+    // 17. DELETE FROM gallery_posts
+    if (queryLower.includes('delete from gallery_posts where id = ?')) {
+      const id = params[0];
+      db.gallery_posts = db.gallery_posts.filter(p => p.id !== id);
+      db.post_stars = db.post_stars.filter(s => s.post_id !== id);
+      db.post_comments = db.post_comments.filter(c => c.post_id !== id);
+      this.write(db);
+      return [{}, null];
+    }
+
+    // 18. Toggle/Insert Stars
+    if (queryLower.includes('insert into post_stars') || queryLower.includes('delete from post_stars')) {
+      const userId = params[0];
+      const postId = params[1];
+      const existsIdx = db.post_stars.findIndex(s => s.user_id === userId && s.post_id === postId);
+      if (queryLower.includes('insert')) {
+        if (existsIdx === -1) {
+          db.post_stars.push({ user_id: userId, post_id: postId });
+        }
+      } else {
+        if (existsIdx !== -1) {
+          db.post_stars.splice(existsIdx, 1);
+        }
+      }
+      this.write(db);
+      return [{}, null];
+    }
+
+    // 19. SELECT comments
+    if (queryLower.includes('select c.id, c.comment_text, c.created_at, c.user_id')) {
+      const postId = params[0];
+      const comms = db.post_comments.filter(c => c.post_id === postId).sort((a,b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      return [comms as any as T, null];
+    }
+
+    // 20. INSERT comment
+    if (queryLower.includes('insert into post_comments')) {
+      const postId = params[0];
+      const userId = params[1];
+      const text = params[2];
+      const newId = db.post_comments.length + 1;
+      db.post_comments.push({
+        id: newId,
+        post_id: postId,
+        user_id: userId,
+        comment_text: text,
+        created_at: new Date().toISOString(),
+      });
       this.write(db);
       return [{}, null];
     }
@@ -413,14 +347,253 @@ class LocalDBProxy {
   }
 }
 
-// Instantiate pool depending on DB_HOST config
+class PostgresDBPool {
+  public pool: pg.Pool;
+
+  constructor() {
+    this.pool = new pg.Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
+  }
+
+  // Translates MySQL dialect to PostgreSQL dialect transparently
+  private translateQuery(sql: string, params: any[] = []): { text: string; values: any[] } {
+    let text = sql;
+    
+    // Replace MySQL backticks with double quotes
+    text = text.replace(/`/g, '"');
+    
+    // Replace MySQL "?" parameter placeholders with PostgreSQL "$1", "$2", etc.
+    let paramIndex = 1;
+    text = text.replace(/\?/g, () => {
+      return `$${paramIndex++}`;
+    });
+
+    // Check if it's an INSERT statement and append RETURNING id for auto-incrementing tables
+    const isInsert = /^\s*insert\s+into/i.test(text);
+    let shouldReturnId = false;
+    if (isInsert) {
+      const match = text.match(/insert\s+into\s+([\w"]+)/i);
+      if (match) {
+        const table = match[1].replace(/"/g, '').toLowerCase();
+        const autoIncrementTables = ['saved_cooks', 'subscribers', 'gear', 'gear_clicks', 'users', 'post_comments'];
+        if (autoIncrementTables.includes(table)) {
+          shouldReturnId = true;
+        }
+      }
+    }
+
+    if (shouldReturnId && !/returning\s+/i.test(text)) {
+      text = text.trim() + ' RETURNING id';
+    }
+
+    return { text, values: params };
+  }
+
+  public async execute<T = any>(sql: string, params: any[] = []): Promise<[T, any]> {
+    const { text, values } = this.translateQuery(sql, params);
+    const result = await this.pool.query(text, values);
+    
+    // Emulate MySQL's result metadata for inserts
+    const isInsert = /^\s*insert\s+into/i.test(sql);
+    if (isInsert && result.rows.length > 0) {
+      const insertId = result.rows[0].id;
+      const response = { insertId, affectedRows: result.rowCount || 1 } as any;
+      return [response as any as T, null];
+    }
+    
+    return [result.rows as any as T, null];
+  }
+
+  public async query<T = any>(sql: string, params: any[] = []): Promise<[T, any]> {
+    return this.execute<T>(sql, params);
+  }
+
+  public async getConnection(): Promise<any> {
+    const client = await this.pool.connect();
+    return {
+      query: async (sql: string, params: any[] = []) => {
+        const { text, values } = this.translateQuery(sql, params);
+        const result = await client.query(text, values);
+        
+        const isInsert = /^\s*insert\s+into/i.test(sql);
+        if (isInsert && result.rows.length > 0) {
+          const insertId = result.rows[0].id;
+          const response = { insertId, affectedRows: result.rowCount || 1 } as any;
+          return [response, null];
+        }
+        return [result.rows, null];
+      },
+      execute: async (sql: string, params: any[] = []) => {
+        const { text, values } = this.translateQuery(sql, params);
+        const result = await client.query(text, values);
+        
+        const isInsert = /^\s*insert\s+into/i.test(sql);
+        if (isInsert && result.rows.length > 0) {
+          const insertId = result.rows[0].id;
+          const response = { insertId, affectedRows: result.rowCount || 1 } as any;
+          return [response, null];
+        }
+        return [result.rows, null];
+      },
+      release: () => client.release()
+    };
+  }
+}
+
+// Setup PostgreSQL schema
+async function runPostgresSetup(pool: PostgresDBPool) {
+  const client = await pool.pool.connect();
+  try {
+    // 1. Create tables
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS saved_cooks (
+        id SERIAL PRIMARY KEY,
+        user_id INT NULL,
+        session_id VARCHAR(255) NOT NULL,
+        method VARCHAR(50) NOT NULL,
+        meat_category VARCHAR(100) NOT NULL,
+        cut VARCHAR(100) NOT NULL,
+        weight_kg DECIMAL(5,2) NOT NULL,
+        result_json TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_saved_cooks_session ON saved_cooks (session_id)');
+    await client.query('CREATE INDEX IF NOT EXISTS idx_saved_cooks_user_id ON saved_cooks (user_id)');
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS cook_tally (
+        id INT PRIMARY KEY,
+        count INT DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS subscribers (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        name VARCHAR(100) NULL,
+        status VARCHAR(50) DEFAULT 'subscribed',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        unsubscribed_at TIMESTAMP NULL
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers (email)');
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gallery_posts (
+        id VARCHAR(21) NOT NULL PRIMARY KEY,
+        before_url VARCHAR(500) NOT NULL,
+        after_url VARCHAR(500) NOT NULL,
+        name VARCHAR(100),
+        cut VARCHAR(100) NOT NULL,
+        method VARCHAR(100) NOT NULL,
+        gear_used TEXT,
+        report_count INT NOT NULL DEFAULT 0,
+        reported SMALLINT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gear (
+        id SERIAL PRIMARY KEY,
+        slug VARCHAR(100) NOT NULL UNIQUE,
+        name VARCHAR(200) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        affiliate_url VARCHAR(500) NOT NULL DEFAULT '#',
+        image_url VARCHAR(500),
+        description TEXT,
+        recommended_for VARCHAR(500),
+        sort_order INT NOT NULL DEFAULT 0
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gear_clicks (
+        id SERIAL PRIMARY KEY,
+        gear_slug VARCHAR(100) NOT NULL,
+        clicked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await client.query('CREATE INDEX IF NOT EXISTS idx_gear_clicks_slug ON gear_clicks (gear_slug)');
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS post_stars (
+        user_id INT NOT NULL,
+        post_id VARCHAR(21) NOT NULL,
+        PRIMARY KEY (user_id, post_id)
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS post_comments (
+        id SERIAL PRIMARY KEY,
+        post_id VARCHAR(21) NOT NULL,
+        user_id INT NOT NULL,
+        comment_text TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 2. Seed cook_tally if empty
+    const tallyRes = await client.query('SELECT id FROM cook_tally WHERE id = 1');
+    if (tallyRes.rows.length === 0) {
+      await client.query('INSERT INTO cook_tally (id, count) VALUES (1, 0)');
+    }
+
+    // 3. Seed gear if empty
+    const gearRes = await client.query('SELECT id FROM gear LIMIT 1');
+    if (gearRes.rows.length === 0) {
+      for (const item of INITIAL_GEAR) {
+        await client.query(
+          `INSERT INTO gear (id, slug, name, category, affiliate_url, description, recommended_for, sort_order)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [item.id, item.slug, item.name, item.category, item.affiliate_url, item.description, item.recommended_for, item.sort_order]
+        );
+      }
+      // Reset sequence for SERIAL id
+      await client.query("SELECT setval('gear_id_seq', (SELECT MAX(id) FROM gear))");
+    }
+
+    console.log('✅ Supabase PostgreSQL schema verified & seeded successfully.');
+  } catch (error) {
+    console.error('❌ Supabase PostgreSQL setup error:', error);
+  } finally {
+    client.release();
+  }
+}
+
+// Instantiate pool depending on env configs
 let pool: {
   execute<T = any>(sql: string, params?: any[]): Promise<[T, any]>;
   query<T = any>(sql: string, params?: any[]): Promise<[T, any]>;
   getConnection(): Promise<any>;
 };
 
-if (process.env.DB_HOST && process.env.DB_HOST.trim() !== '') {
+if (process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '') {
+  const pgPool = new PostgresDBPool();
+  pool = pgPool;
+
+  // Run schema setups once on startup - skip during Next.js build
+  if (process.env.NEXT_PHASE !== 'phase-production-build') {
+    runPostgresSetup(pgPool).catch(console.error);
+  }
+} else if (process.env.DB_HOST && process.env.DB_HOST.trim() !== '') {
   pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT) || 3306,
@@ -443,13 +616,12 @@ if (process.env.DB_HOST && process.env.DB_HOST.trim() !== '') {
     }
   }
 
-  // Run once on startup — skip during `next build` (no DB available at build time)
   if (process.env.NEXT_PHASE !== 'phase-production-build') {
     runMigrations().catch(console.error);
   }
 } else {
   if (typeof window === 'undefined') {
-    console.warn('⚠️ No DB_HOST found in env. Falling back to local JSON database at data/local_db.json.');
+    console.warn('⚠️ No database credentials found. Falling back to local JSON database.');
   }
   pool = new LocalDBProxy();
 }
